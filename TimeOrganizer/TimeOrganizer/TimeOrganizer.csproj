@@ -2,11 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>af14612b-a78a-4595-b4f1-74ca406e7b98</UserSecretsId>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Folder Include="Controller\" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.9" />
