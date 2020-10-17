@@ -10,6 +10,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using TimeOrganizer.Model;
 using Microsoft.EntityFrameworkCore;
+using TimeOrganizer.Model.InterfaceRepo;
+using TimeOrganizer.Model.SqlRepository;
 
 namespace TimeOrganizer
 {
@@ -28,6 +30,10 @@ namespace TimeOrganizer
         {
             services.AddDbContextPool<AppDbContext>(
                 options => options.UseSqlServer(conf.GetConnectionString("TimeOrganizerDatabase")));
+
+            services.AddMvc(options => options.EnableEndpointRouting = false);
+
+            services.AddScoped<ISchoolTypeRepository, SqlSchoolTypeRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,6 +44,7 @@ namespace TimeOrganizer
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMvcWithDefaultRoute();
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
