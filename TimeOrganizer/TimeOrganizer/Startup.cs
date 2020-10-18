@@ -12,6 +12,8 @@ using TimeOrganizer.Model;
 using Microsoft.EntityFrameworkCore;
 using TimeOrganizer.Model.InterfaceRepo;
 using TimeOrganizer.Model.SqlRepository;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace TimeOrganizer
 {
@@ -31,8 +33,10 @@ namespace TimeOrganizer
             services.AddDbContextPool<AppDbContext>(
                 options => options.UseSqlServer(conf.GetConnectionString("TimeOrganizerDatabase")));
 
-            services.AddMvc(options => options.EnableEndpointRouting = false);
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<AppDbContext>();
 
+            services.AddMvc(options => options.EnableEndpointRouting = false);
             services.AddScoped<ISchoolTypeRepository, SqlSchoolTypeRepository>();
         }
 
@@ -44,6 +48,7 @@ namespace TimeOrganizer
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseAuthentication();
             app.UseMvcWithDefaultRoute();
             app.UseRouting();
 
