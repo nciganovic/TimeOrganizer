@@ -12,5 +12,7 @@ namespace TimeOrganizer.Model.Tables
         public int SchoolTypeId { get; set; }
         public SchoolType SchoolType { get; set; }
         public string Name { get; set; }
+
+        public List<ApplicationUser> ApplicationUsers { get; set; }
     }
 }
