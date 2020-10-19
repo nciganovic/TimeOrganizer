@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TimeOrganizer.Model;
 using TimeOrganizer.Model.InterfaceRepo;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TimeOrganizer.Controller
 {
@@ -19,6 +20,7 @@ namespace TimeOrganizer.Controller
 
         [HttpGet]
         [Route("/")]
+        [Authorize]
         public JsonResult Index() {
             IEnumerable<SchoolType> allSchoolTypes = schoolTypeRepository.AllSchoolTypes();
             JsonResult jsonResult = new JsonResult(allSchoolTypes);
