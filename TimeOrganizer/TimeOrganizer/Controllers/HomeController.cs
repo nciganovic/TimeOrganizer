@@ -7,9 +7,9 @@ using TimeOrganizer.Model;
 using TimeOrganizer.Model.InterfaceRepo;
 using Microsoft.AspNetCore.Authorization;
 
-namespace TimeOrganizer.Controller
+namespace TimeOrganizer.Controllers
 {
-    public class HomeController
+    public class HomeController : Controller
     {
         private ISchoolTypeRepository schoolTypeRepository;
 

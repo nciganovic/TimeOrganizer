@@ -14,6 +14,7 @@ using TimeOrganizer.Model.InterfaceRepo;
 using TimeOrganizer.Model.SqlRepository;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using TimeOrganizer.Model.Tables;
 
 namespace TimeOrganizer
 {
@@ -33,7 +34,7 @@ namespace TimeOrganizer
             services.AddDbContextPool<AppDbContext>(
                 options => options.UseSqlServer(conf.GetConnectionString("TimeOrganizerDatabase")));
 
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>();
 
             services.AddMvc(options => options.EnableEndpointRouting = false);
