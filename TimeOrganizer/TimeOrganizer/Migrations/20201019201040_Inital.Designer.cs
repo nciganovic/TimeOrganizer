@@ -10,8 +10,8 @@ using TimeOrganizer.Model;
 namespace TimeOrganizer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20201018175618_ExtendApplicationUser")]
-    partial class ExtendApplicationUser
+    [Migration("20201019201040_Inital")]
+    partial class Inital
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
