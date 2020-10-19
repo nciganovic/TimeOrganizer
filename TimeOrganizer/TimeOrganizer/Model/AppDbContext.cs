@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TimeOrganizer.Model.Tables;
 
 namespace TimeOrganizer.Model
 {
@@ -15,5 +16,6 @@ namespace TimeOrganizer.Model
         }
 
         public DbSet<SchoolType> SchoolTypes { get; set; }
+        public DbSet<School> School { get; set; }
     }
 }
