@@ -16,19 +16,48 @@ namespace TimeOrganizer.Controllers
     {
         private UserManager<ApplicationUser> userManager;
         private ISchoolRepository schoolRepository;
+        private SignInManager<ApplicationUser> signInManager;
 
-        public AccountController(UserManager<ApplicationUser> userManager, ISchoolRepository schoolRepository)
+        public AccountController(UserManager<ApplicationUser> userManager, ISchoolRepository schoolRepository, SignInManager<ApplicationUser> signInManager)
         {
             this.userManager = userManager;
             this.schoolRepository = schoolRepository;
+            this.signInManager = signInManager;
         }
 
         [HttpPost]
         [Route("login")]
-        public IActionResult Login()
+        public async Task<IActionResult> Login(LoginViewModel loginViewModel, string ReturnUrl)
         {
-            JsonResult jsonResult = new JsonResult(new { });
-            return jsonResult;
+            if (ModelState.IsValid) {
+                var user = await userManager.FindByEmailAsync(loginViewModel.Email);
+
+                bool isEmailConfirmed = true;
+                if (user != null && !user.EmailConfirmed && (await userManager.CheckPasswordAsync(user, loginViewModel.Password))) {
+                    ModelState.AddModelError(string.Empty, "Email not confirmed yet.");
+                    isEmailConfirmed = false;
+                }
+
+                var result = await signInManager.PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe, false);
+
+                if (result.Succeeded && isEmailConfirmed)
+                {
+                    if (Url.IsLocalUrl(ReturnUrl) && !String.IsNullOrEmpty(ReturnUrl)){
+                        return Redirect(ReturnUrl);
+                    }
+                    else {
+                        return RedirectToAction("index", "home");
+                    }
+                }
+                else {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt");
+                }
+            }
+
+            //Return Errors as JSON 
+            //Later can be return View(model);
+            var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            return new JsonResult(new { errors = invalidModelStateError });
         }
 
         
@@ -41,8 +70,10 @@ namespace TimeOrganizer.Controllers
                 //Check if school id exists
                 var school = schoolRepository.GetSchoolById(registerViewModel.SchoolId);
 
+                bool schoolExists = true;
                 if (school == null) {
-                    return new JsonResult(new { errors = new { errorMessage = "This school does not exist." } });
+                    ModelState.AddModelError(string.Empty, "This school does not exist.");
+                    schoolExists = false;
                 }
 
                 var user = new ApplicationUser
@@ -57,7 +88,7 @@ namespace TimeOrganizer.Controllers
 
                 var result = await userManager.CreateAsync(user, registerViewModel.Password);
 
-                if (result.Succeeded)
+                if (result.Succeeded && schoolExists)
                 {
                     return new JsonResult(new { Message = "success" });
                 }
