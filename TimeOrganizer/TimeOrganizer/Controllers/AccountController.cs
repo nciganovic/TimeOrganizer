@@ -8,16 +8,19 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using TimeOrganizer.Model.Tables;
 using TimeOrganizer.ViewModel;
+using TimeOrganizer.Model.InterfaceRepo;
 
 namespace TimeOrganizer.Controllers
 {
     public class AccountController : Controller
     {
         private UserManager<ApplicationUser> userManager;
+        private ISchoolRepository schoolRepository;
 
-        public AccountController(UserManager<ApplicationUser> userManager)
+        public AccountController(UserManager<ApplicationUser> userManager, ISchoolRepository schoolRepository)
         {
             this.userManager = userManager;
+            this.schoolRepository = schoolRepository;
         }
 
         [HttpPost]
@@ -35,6 +38,13 @@ namespace TimeOrganizer.Controllers
         {
             if (ModelState.IsValid)
             {
+                //Check if school id exists
+                var school = schoolRepository.GetSchoolById(registerViewModel.SchoolId);
+
+                if (school == null) {
+                    return new JsonResult(new { errors = new { errorMessage = "This school does not exist." } });
+                }
+
                 var user = new ApplicationUser
                 {
                     UserName = registerViewModel.Email,
@@ -56,6 +66,7 @@ namespace TimeOrganizer.Controllers
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
+                        //User name 'nciganovic@gmail.com' is already taken is possible answer 
                     }
                 }
 
