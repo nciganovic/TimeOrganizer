@@ -6,25 +6,30 @@ using System.Threading.Tasks;
 using TimeOrganizer.Model;
 using TimeOrganizer.Model.InterfaceRepo;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using TimeOrganizer.Model.Tables;
 
 namespace TimeOrganizer.Controllers
 {
     public class HomeController : Controller
-    {
-        private ISchoolTypeRepository schoolTypeRepository;
+    { 
+        private UserManager<ApplicationUser> userManager;
 
-        public HomeController(ISchoolTypeRepository schoolTypeRepository)
+        public HomeController(UserManager<ApplicationUser> userManager)
         {
-            this.schoolTypeRepository = schoolTypeRepository;
+            this.userManager = userManager;
         }
 
         [HttpGet]
         [Route("/")]
         [Authorize]
-        public JsonResult Index() {
-            IEnumerable<SchoolType> allSchoolTypes = schoolTypeRepository.AllSchoolTypes();
-            JsonResult jsonResult = new JsonResult(allSchoolTypes);
-            return jsonResult;
+        public async Task<IActionResult> Index() {
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            
+            return new JsonResult(new { 
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            });
         }
     }
 }
