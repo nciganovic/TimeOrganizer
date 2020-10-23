@@ -18,5 +18,6 @@ namespace TimeOrganizer.Model
         public DbSet<SchoolType> SchoolTypes { get; set; }
         public DbSet<School> Schools { get; set; }
         public DbSet<TaskType> TaskTypes { get; set; }
+        public DbSet<Color> Colors { get; set; }
     }
 }
