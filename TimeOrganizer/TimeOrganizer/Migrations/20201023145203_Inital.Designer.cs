@@ -10,7 +10,7 @@ using TimeOrganizer.Model;
 namespace TimeOrganizer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20201019201040_Inital")]
+    [Migration("20201023145203_Inital")]
     partial class Inital
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
