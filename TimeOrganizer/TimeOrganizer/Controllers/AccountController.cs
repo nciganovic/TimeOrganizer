@@ -70,34 +70,37 @@ namespace TimeOrganizer.Controllers
                 //Check if school id exists
                 var school = schoolRepository.GetSchoolById(registerViewModel.SchoolId);
 
-                bool schoolExists = true;
-                if (school == null) {
+
+                if (school == null)
+                {
                     ModelState.AddModelError(string.Empty, "This school does not exist.");
-                    schoolExists = false;
+
                 }
-
-                var user = new ApplicationUser
-                {
-                    UserName = registerViewModel.Email,
-                    FirstName = registerViewModel.FirstName,
-                    LastName = registerViewModel.LastName,
-                    Email = registerViewModel.Email,
-                    SchoolId = registerViewModel.SchoolId, //check if school id exists
-                    EmailConfirmed = true //auto confirm email for now 
-                };
-
-                var result = await userManager.CreateAsync(user, registerViewModel.Password);
-
-                if (result.Succeeded && schoolExists)
-                {
-                    return new JsonResult(new { Message = "success" });
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
+                else{
+                    var user = new ApplicationUser
                     {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                        //User name 'nciganovic@gmail.com' is already taken is possible answer 
+                        UserName = registerViewModel.Email,
+                        FirstName = registerViewModel.FirstName,
+                        LastName = registerViewModel.LastName,
+                        Email = registerViewModel.Email,
+                        SchoolId = registerViewModel.SchoolId, //check if school id exists
+                        EmailConfirmed = true //auto confirm email for now 
+                    };
+
+                    //Trows error if only school id is bad
+                    var result = await userManager.CreateAsync(user, registerViewModel.Password);
+
+                    if (result.Succeeded)
+                    {
+                        return new JsonResult(new { Message = "success" });
+                    }
+                    else
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                            //User name 'nciganovic@gmail.com' is already taken is possible answer 
+                        }
                     }
                 }
 
