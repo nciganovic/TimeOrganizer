@@ -20,5 +20,23 @@ namespace TimeOrganizer.Model
         public DbSet<TaskType> TaskTypes { get; set; }
         public DbSet<Color> Colors { get; set; }
         public DbSet<Tables.Task> Tasks { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ApplicationUserTask>()
+            .HasKey(at => new { at.ApplicationUserId, at.TaskId });
+
+            modelBuilder.Entity<ApplicationUserTask>()
+                .HasOne(at => at.ApplicationUser)
+                .WithMany(t => t.ApplicationUserTasks)
+                .HasForeignKey(pt => pt.ApplicationUserId);
+
+            modelBuilder.Entity<ApplicationUserTask>()
+                .HasOne(at => at.Task)
+                .WithMany(t => t.ApplicationUserTasks)
+                .HasForeignKey(at => at.TaskId);
+        }
     }
 }

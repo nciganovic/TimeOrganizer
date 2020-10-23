@@ -18,5 +18,6 @@ namespace TimeOrganizer.Model.Tables
         public Color Color { get; set; }
         public int TaskTypeId { get; set; }
         public TaskType TaskType { get; set; }
+        public List<ApplicationUserTask> ApplicationUserTasks { get; set; }
     }
 }

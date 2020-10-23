@@ -16,6 +16,7 @@ namespace TimeOrganizer.Model.Tables
         public int SchoolId { get; set; }
 
         public School School { get; set; }
-    
+
+        public List<ApplicationUserTask> ApplicationUserTasks { get; set; }
     }
 }
