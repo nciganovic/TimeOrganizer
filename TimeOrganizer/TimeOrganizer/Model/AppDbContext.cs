@@ -16,6 +16,6 @@ namespace TimeOrganizer.Model
         }
 
         public DbSet<SchoolType> SchoolTypes { get; set; }
-        public DbSet<School> School { get; set; }
+        public DbSet<School> Schools { get; set; }
     }
 }

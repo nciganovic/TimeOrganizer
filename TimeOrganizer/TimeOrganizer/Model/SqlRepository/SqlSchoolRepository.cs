@@ -18,7 +18,7 @@ namespace TimeOrganizer.Model.SqlRepository
 
         public School GetSchoolById(int id)
         {
-            School school = appDbContext.School.Find(id);
+            School school = appDbContext.Schools.Find(id);
             return school;
         }
     }
