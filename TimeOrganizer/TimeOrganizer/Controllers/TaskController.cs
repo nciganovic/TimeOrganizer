@@ -10,6 +10,7 @@ using TimeOrganizer.Model.Tables;
 
 namespace TimeOrganizer.Controllers
 {
+    [Authorize]
     public class TaskController : Controller
     {
         private UserManager<ApplicationUser> userManager;
@@ -22,7 +23,6 @@ namespace TimeOrganizer.Controllers
 
         }
 
-        [Authorize]
         [Route("task/read")]
         public async Task<IActionResult> ReadTask(DateTime startTime, DateTime endTime) {
             var user = await userManager.FindByNameAsync(User.Identity.Name);
