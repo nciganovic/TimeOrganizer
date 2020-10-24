@@ -40,6 +40,7 @@ namespace TimeOrganizer
             services.AddMvc(options => options.EnableEndpointRouting = false);
             services.AddScoped<ISchoolTypeRepository, SqlSchoolTypeRepository>();
             services.AddScoped<ISchoolRepository, SqlSchoolRepository>();
+            services.AddScoped<ITaskRepository, SqlTaskRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

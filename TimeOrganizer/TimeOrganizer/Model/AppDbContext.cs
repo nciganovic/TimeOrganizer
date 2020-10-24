@@ -20,6 +20,7 @@ namespace TimeOrganizer.Model
         public DbSet<TaskType> TaskTypes { get; set; }
         public DbSet<Color> Colors { get; set; }
         public DbSet<Tables.Task> Tasks { get; set; }
+        public DbSet<ApplicationUserTask> ApplicationUserTask { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
