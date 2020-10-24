@@ -18,5 +18,7 @@ namespace TimeOrganizer.Model.Tables
         public School School { get; set; }
 
         public List<ApplicationUserTask> ApplicationUserTasks { get; set; }
+    
+        public List<Task> Tasks { get; set; }
     }
 }

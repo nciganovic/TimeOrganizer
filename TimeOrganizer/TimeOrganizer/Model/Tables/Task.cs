@@ -19,5 +19,8 @@ namespace TimeOrganizer.Model.Tables
         public int TaskTypeId { get; set; }
         public TaskType TaskType { get; set; }
         public List<ApplicationUserTask> ApplicationUserTasks { get; set; }
+        public string ApplicationUserId { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
+
     }
 }
