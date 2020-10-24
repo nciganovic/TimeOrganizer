@@ -32,7 +32,8 @@ namespace TimeOrganizer.Model.SqlRepository
                     Priority = x.Priority,
                     TaskTypeName = x.TaskType.Name,
                     Title = x.Title,
-                    SearchingUserId = y.ApplicationUserId
+                    SearchingUserId = y.ApplicationUserId,
+                    TaskCreatorUsername = x.ApplicationUser.UserName
                 })
                 .Where(x => x.SearchingUserId == searchingUserId && startTime <= x.StartTime && endTime >= x.EndTime)
                 .ToList();

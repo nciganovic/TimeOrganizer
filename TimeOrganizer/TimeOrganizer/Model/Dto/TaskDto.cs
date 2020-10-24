@@ -16,5 +16,6 @@ namespace TimeOrganizer.Model.Dto
         public string ColorName { get; set; }
         public string TaskTypeName { get; set; }
         public string SearchingUserId { get; set; }
+        public string TaskCreatorUsername { get; set; }
     }
 }
