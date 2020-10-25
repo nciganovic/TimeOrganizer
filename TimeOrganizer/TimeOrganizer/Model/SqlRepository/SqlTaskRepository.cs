@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using TimeOrganizer.Model.Dto;
 using TimeOrganizer.Model.InterfaceRepo;
+using TimeOrganizer.Model.Tables;
+using TimeOrganizer.ViewModel;
 
 namespace TimeOrganizer.Model.SqlRepository
 {
@@ -16,6 +17,24 @@ namespace TimeOrganizer.Model.SqlRepository
         public SqlTaskRepository(AppDbContext appDbContext)
         {
             this.appDbContext = appDbContext;
+        }
+
+        public Task Create(CreateTaskViewModel createTaskViewModel)
+        {
+            Task task = new Task() {
+                StartTime = createTaskViewModel.StartTime,
+                EndTime = createTaskViewModel.EndTime,
+                Title = createTaskViewModel.Title,
+                Description = createTaskViewModel.Description,
+                TaskTypeId = createTaskViewModel.TaskTypeId,
+                ColorId = createTaskViewModel.ColorId,
+                Priority = createTaskViewModel.Priority,
+                ApplicationUserId = createTaskViewModel.TaskCreatorId,
+            };
+
+            appDbContext.Tasks.Add(task);
+            appDbContext.SaveChanges();
+            return task;
         }
 
         public IEnumerable<TaskDto> GetTask(string searchingUserId, DateTime startTime, DateTime endTime)
