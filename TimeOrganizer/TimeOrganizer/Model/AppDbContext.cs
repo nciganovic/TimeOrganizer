@@ -1,9 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TimeOrganizer.Model.Tables;
 
 namespace TimeOrganizer.Model
@@ -19,7 +15,7 @@ namespace TimeOrganizer.Model
         public DbSet<School> Schools { get; set; }
         public DbSet<TaskType> TaskTypes { get; set; }
         public DbSet<Color> Colors { get; set; }
-        public DbSet<Tables.Task> Tasks { get; set; }
+        public DbSet<Task> Tasks { get; set; }
         public DbSet<ApplicationUserTask> ApplicationUserTask { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
