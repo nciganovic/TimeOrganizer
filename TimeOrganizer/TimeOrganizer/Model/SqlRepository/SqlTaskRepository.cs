@@ -55,9 +55,31 @@ namespace TimeOrganizer.Model.SqlRepository
                     TaskCreatorUsername = x.ApplicationUser.UserName
                 })
                 .Where(x => x.SearchingUserId == searchingUserId && startTime <= x.StartTime && endTime >= x.EndTime)
+                .OrderBy(x => x.StartTime)
                 .ToList();
 
             return data;
+        }
+
+        public bool CheckDateBounds(IEnumerable<TaskDto> tasks, DateTime taskStartTime, DateTime taskEndTime) {
+            bool isTaskTimeValid = true;
+
+            foreach (var task in tasks) {
+                if (taskStartTime >= task.StartTime && taskStartTime < task.EndTime) {
+                    isTaskTimeValid = false;
+                    break;
+                }
+                if (taskEndTime > task.StartTime && taskEndTime <= task.EndTime) {
+                    isTaskTimeValid = false;
+                    break;
+                }
+                if (taskStartTime < task.StartTime && taskEndTime > task.EndTime) {
+                    isTaskTimeValid = false;
+                    break;
+                }
+            }
+
+            return isTaskTimeValid;
         }
     }
 }

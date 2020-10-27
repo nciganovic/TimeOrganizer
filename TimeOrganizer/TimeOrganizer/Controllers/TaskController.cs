@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using TimeOrganizer.Model.Dto;
 using TimeOrganizer.Model.InterfaceRepo;
 using TimeOrganizer.Model.SqlRepository;
 using TimeOrganizer.Model.Tables;
@@ -20,13 +22,19 @@ namespace TimeOrganizer.Controllers
         private ITaskRepository taskRepository;
         private IColorRepository colorRepository;
         private ITaskTypeRepository taskTypeRepository;
+        private IApplicationUserTaskRepository applicationUserTaskRepository;
 
-        public TaskController(ITaskRepository taskRepository, UserManager<ApplicationUser> userManager, IColorRepository colorRepository, ITaskTypeRepository taskTypeRepository)
+        public TaskController(ITaskRepository taskRepository, 
+            UserManager<ApplicationUser> userManager, 
+            IColorRepository colorRepository, 
+            ITaskTypeRepository taskTypeRepository,
+            IApplicationUserTaskRepository applicationUserTaskRepository)
         {
             this.taskRepository = taskRepository;
             this.userManager = userManager;
             this.colorRepository = colorRepository;
             this.taskTypeRepository = taskTypeRepository;
+            this.applicationUserTaskRepository = applicationUserTaskRepository;
         }
 
         [Route("task/read")]
@@ -44,8 +52,13 @@ namespace TimeOrganizer.Controllers
             createTaskViewModel.TaskCreatorId = user.Id;
 
             if (ModelState.IsValid) {
-               
-                if (colorRepository.GetColorById(createTaskViewModel.ColorId) == null)
+
+                IEnumerable<TaskDto> tasksForCurrentDay = GetAllTasksForCurrentDay(createTaskViewModel.StartTime, user.Id);
+
+                if (!taskRepository.CheckDateBounds(tasksForCurrentDay, createTaskViewModel.StartTime, createTaskViewModel.EndTime)) {
+                    ModelState.AddModelError(string.Empty, $"Time bounds are not valid");
+                }
+                else if (colorRepository.GetColorById(createTaskViewModel.ColorId) == null)
                 {
                     ModelState.AddModelError(string.Empty, $"Color with id = {createTaskViewModel.ColorId} does not exist.");
                 }
@@ -55,9 +68,10 @@ namespace TimeOrganizer.Controllers
                 else {
                     try
                     {
-                        taskRepository.Create(createTaskViewModel);
+                        var task = taskRepository.Create(createTaskViewModel);
+                        applicationUserTaskRepository.Create(task.ApplicationUserId, task.Id);
                         return new JsonResult(new { message = "task created successfully" });
-                        //return new JsonResult(new { task = task});
+                        //return new JsonResult(new { task = task});                                                                                                            
                     }
                     catch (Exception exp) {
                         ModelState.AddModelError(string.Empty, exp.Message);
@@ -67,6 +81,16 @@ namespace TimeOrganizer.Controllers
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
             return new JsonResult(new { errors = invalidModelStateError });
+        }
+
+        private IEnumerable<TaskDto> GetAllTasksForCurrentDay(DateTime date, string userId) {
+
+            DateTime currentDayStart = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0);
+            DateTime currentDayEnd = new DateTime(date.Year, date.Month, date.Day, 23, 59, 59);
+
+            IEnumerable<TaskDto> tasksForCurrentDay = taskRepository.GetTask(userId, currentDayStart, currentDayEnd);
+            
+            return tasksForCurrentDay;
         }
     }
 }

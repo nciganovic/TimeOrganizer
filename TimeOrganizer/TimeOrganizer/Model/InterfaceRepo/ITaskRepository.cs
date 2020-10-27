@@ -11,5 +11,6 @@ namespace TimeOrganizer.Model.InterfaceRepo
     {
         public IEnumerable<TaskDto> GetTask(string authorId, DateTime startTime, DateTime endTime);
         public Task Create(CreateTaskViewModel createTaskViewModel);
+        public bool CheckDateBounds(IEnumerable<TaskDto> tasks, DateTime taskStartTime, DateTime taskEndTime);
     }
 }
