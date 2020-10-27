@@ -11,6 +11,8 @@ namespace TimeOrganizer.ViewModel
     {
         [Required]
         [EndGreatedThenStartDate("EndTime", "End time is smaller then Start time")]
+        [FutureDate]
+        [DatesAreSameDay("EndTime")]
         public DateTime StartTime { get; set; }
 
         [Required]
