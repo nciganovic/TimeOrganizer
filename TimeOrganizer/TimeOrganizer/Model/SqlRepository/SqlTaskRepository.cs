@@ -37,7 +37,20 @@ namespace TimeOrganizer.Model.SqlRepository
             return task;
         }
 
-        public IEnumerable<TaskDto> GetTask(string searchingUserId, DateTime startTime, DateTime endTime)
+        public Task Read(string applicaitonUserId, int taskId)
+        {
+            var task = appDbContext.Tasks.Find(taskId);
+
+            if (task != null) {
+                if (task.ApplicationUserId != applicaitonUserId) {
+                    return null;
+                }    
+            }
+
+            return task;
+        }
+
+        public IEnumerable<TaskDto> Read(string searchingUserId, DateTime startTime, DateTime endTime)
         {
             var data = appDbContext.Tasks.Join(appDbContext.ApplicationUserTask, 
                 x => x.Id, 
@@ -116,15 +129,6 @@ namespace TimeOrganizer.Model.SqlRepository
                 throw new Exception($"Task with id = {id} does not exist");
             }
 
-            return task;
-        }
-
-        public Task Read(int id)
-        {
-            var task = appDbContext.Tasks.Find(id);
-            if (task == null) {
-                throw new Exception($"Task with id = {id} does not exist");
-            }
             return task;
         }
     }

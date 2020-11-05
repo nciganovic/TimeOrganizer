@@ -40,7 +40,7 @@ namespace TimeOrganizer.Controllers
         [Route("task/read")]
         public async Task<IActionResult> ReadTask(DateTime startTime, DateTime endTime) {
             var user = await userManager.FindByNameAsync(User.Identity.Name);
-            var data = taskRepository.GetTask(user.Id, startTime, endTime);
+            var data = taskRepository.Read(user.Id, startTime, endTime);
             return new JsonResult(data);
         }
 
@@ -88,7 +88,7 @@ namespace TimeOrganizer.Controllers
             DateTime currentDayStart = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0);
             DateTime currentDayEnd = new DateTime(date.Year, date.Month, date.Day, 23, 59, 59);
 
-            IEnumerable<TaskDto> tasksForCurrentDay = taskRepository.GetTask(userId, currentDayStart, currentDayEnd);
+            IEnumerable<TaskDto> tasksForCurrentDay = taskRepository.Read(userId, currentDayStart, currentDayEnd);
             
             return tasksForCurrentDay;
         }
@@ -138,30 +138,21 @@ namespace TimeOrganizer.Controllers
         public async Task<IActionResult> DeleteTask(int id) 
         {
             var user = await userManager.FindByNameAsync(User.Identity.Name);
-            Model.Tables.Task task;
+            var task = taskRepository.Read(user.Id, id);
 
-            try
+            if (task != null)
             {
-                task = taskRepository.Read(id);
-                
-                if (task.ApplicationUserId != user.Id)
+                try
                 {
-                    ModelState.AddModelError(string.Empty, "Deleting other user's tasks is not allowed.");
+                    taskRepository.Delete(id);
                 }
-                else
+                catch (Exception exp)
                 {
-                    try
-                    {
-                        taskRepository.Delete(id);
-                    }
-                    catch (Exception exp)
-                    {
-                        ModelState.AddModelError(string.Empty, exp.Message);
-                    }
+                    ModelState.AddModelError(string.Empty, exp.Message);
                 }
             }
-            catch(Exception exp) {
-                ModelState.AddModelError(string.Empty, exp.Message);
+            else {
+                ModelState.AddModelError(string.Empty, $"Task with id = {id} and userId = {user.Id} does not exist");
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
