@@ -83,12 +83,12 @@ namespace TimeOrganizer.Controllers
             return new JsonResult(new { errors = invalidModelStateError });
         }
 
-        private IEnumerable<TaskDto> GetAllTasksForCurrentDay(DateTime date, string userId) 
+        private IEnumerable<TaskDto> GetAllTasksForCurrentDay(DateTime date, string userId, int skipTaskId = -1) 
         {
             DateTime currentDayStart = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0);
             DateTime currentDayEnd = new DateTime(date.Year, date.Month, date.Day, 23, 59, 59);
 
-            IEnumerable<TaskDto> tasksForCurrentDay = taskRepository.Read(userId, currentDayStart, currentDayEnd);
+            IEnumerable<TaskDto> tasksForCurrentDay = taskRepository.Read(userId, currentDayStart, currentDayEnd, skipTaskId);
             
             return tasksForCurrentDay;
         }
@@ -101,7 +101,7 @@ namespace TimeOrganizer.Controllers
 
             if (ModelState.IsValid) {
 
-                IEnumerable<TaskDto> tasksForCurrentDay = GetAllTasksForCurrentDay(updateTaskViewModel.StartTime, user.Id);
+                IEnumerable<TaskDto> tasksForCurrentDay = GetAllTasksForCurrentDay(updateTaskViewModel.StartTime, user.Id, updateTaskViewModel.Id);
 
                 if (!taskRepository.CheckDateBounds(tasksForCurrentDay, updateTaskViewModel.StartTime, updateTaskViewModel.EndTime))
                 {

@@ -74,6 +74,30 @@ namespace TimeOrganizer.Model.SqlRepository
             return data;
         }
 
+        public IEnumerable<TaskDto> Read(string searchingUserId, DateTime startTime, DateTime endTime, int excludeTaskId)
+        {
+            var data = appDbContext.Tasks.Join(appDbContext.ApplicationUserTask, 
+                x => x.Id, 
+                y => y.TaskId, 
+                (x, y) => new TaskDto { 
+                    Id = x.Id,
+                    ColorName = x.Color.Name,
+                    StartTime = x.StartTime,
+                    EndTime = x.EndTime,
+                    Description = x.Description,
+                    Priority = x.Priority,
+                    TaskTypeName = x.TaskType.Name,
+                    Title = x.Title,
+                    SearchingUserId = y.ApplicationUserId,
+                    TaskCreatorUsername = x.ApplicationUser.UserName
+                })
+                .Where(x => x.SearchingUserId == searchingUserId && startTime <= x.StartTime && endTime >= x.EndTime && x.Id != excludeTaskId)
+                .OrderBy(x => x.StartTime)
+                .ToList();
+
+            return data;
+        }
+
         public bool CheckDateBounds(IEnumerable<TaskDto> tasks, DateTime taskStartTime, DateTime taskEndTime) {
             bool isTaskTimeValid = true;
 
