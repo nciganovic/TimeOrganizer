@@ -92,5 +92,45 @@ namespace TimeOrganizer.Controllers
             
             return tasksForCurrentDay;
         }
+        /*
+        [HttpPost]
+        [Route("task/update")]
+        public async Task<IActionResult> UpdateTask(UpdateTaskViewModel updateTaskViewModel) {
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            updateTaskViewModel.TaskCreatorId = user.Id;
+
+            if (ModelState.IsValid) {
+
+                IEnumerable<TaskDto> tasksForCurrentDay = GetAllTasksForCurrentDay(updateTaskViewModel.StartTime, user.Id);
+
+                if (!taskRepository.CheckDateBounds(tasksForCurrentDay, updateTaskViewModel.StartTime, updateTaskViewModel.EndTime))
+                {
+                    ModelState.AddModelError(string.Empty, $"Time bounds are not valid");
+                }
+                else if (colorRepository.GetColorById(updateTaskViewModel.ColorId) == null)
+                {
+                    ModelState.AddModelError(string.Empty, $"Color with id = {updateTaskViewModel.ColorId} does not exist.");
+                }
+                else if (taskTypeRepository.GetTaskTypeById(updateTaskViewModel.TaskTypeId) == null)
+                {
+                    ModelState.AddModelError(string.Empty, $"Task type with id = {updateTaskViewModel.TaskTypeId} does not exist.");
+                }
+                else
+                {
+                    try
+                    {
+                        var task = taskRepository.Update(updateTaskViewModel);
+                        return new JsonResult(new { message = "task updated successfully" });                                                                                                      
+                    }
+                    catch (Exception exp)
+                    {
+                        ModelState.AddModelError(string.Empty, exp.Message);
+                    }
+                }
+            }
+
+            var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            return new JsonResult(new { errors = invalidModelStateError });
+        }*/
     }
 }

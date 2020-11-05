@@ -81,5 +81,26 @@ namespace TimeOrganizer.Model.SqlRepository
 
             return isTaskTimeValid;
         }
+
+        public Task Update(UpdateTaskViewModel updateTaskViewModel)
+        {
+            Task task = new Task()
+            {
+                Id = updateTaskViewModel.Id,
+                StartTime = updateTaskViewModel.StartTime,
+                EndTime = updateTaskViewModel.EndTime,
+                Title = updateTaskViewModel.Title,
+                Description = updateTaskViewModel.Description,
+                TaskTypeId = updateTaskViewModel.TaskTypeId,
+                ColorId = updateTaskViewModel.ColorId,
+                Priority = updateTaskViewModel.Priority,
+                ApplicationUserId = updateTaskViewModel.TaskCreatorId,
+            };
+
+            var editBook = appDbContext.Tasks.Attach(task);
+            editBook.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            appDbContext.SaveChanges();
+            return task;
+        }
     }
 }
