@@ -83,8 +83,8 @@ namespace TimeOrganizer.Controllers
             return new JsonResult(new { errors = invalidModelStateError });
         }
 
-        private IEnumerable<TaskDto> GetAllTasksForCurrentDay(DateTime date, string userId) {
-
+        private IEnumerable<TaskDto> GetAllTasksForCurrentDay(DateTime date, string userId) 
+        {
             DateTime currentDayStart = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0);
             DateTime currentDayEnd = new DateTime(date.Year, date.Month, date.Day, 23, 59, 59);
 
@@ -92,7 +92,7 @@ namespace TimeOrganizer.Controllers
             
             return tasksForCurrentDay;
         }
-        /*
+        
         [HttpPost]
         [Route("task/update")]
         public async Task<IActionResult> UpdateTask(UpdateTaskViewModel updateTaskViewModel) {
@@ -131,6 +131,42 @@ namespace TimeOrganizer.Controllers
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
             return new JsonResult(new { errors = invalidModelStateError });
-        }*/
+        }
+
+        [HttpPost]
+        [Route("task/delete")]
+        public async Task<IActionResult> DeleteTask(int id) 
+        {
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            Model.Tables.Task task;
+
+            try
+            {
+                task = taskRepository.Read(id);
+                
+                if (task.ApplicationUserId != user.Id)
+                {
+                    ModelState.AddModelError(string.Empty, "Deleting other user's tasks is not allowed.");
+                }
+                else
+                {
+                    try
+                    {
+                        taskRepository.Delete(id);
+                    }
+                    catch (Exception exp)
+                    {
+                        ModelState.AddModelError(string.Empty, exp.Message);
+                    }
+                }
+            }
+            catch(Exception exp) {
+                ModelState.AddModelError(string.Empty, exp.Message);
+            }
+
+            var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            return new JsonResult(new { errors = invalidModelStateError });
+        }
+
     }
 }

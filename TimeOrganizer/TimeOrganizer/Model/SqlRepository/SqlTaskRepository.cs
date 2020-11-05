@@ -102,5 +102,30 @@ namespace TimeOrganizer.Model.SqlRepository
             appDbContext.SaveChanges();
             return task;
         }
+
+        public Task Delete(int id)
+        {
+            Task task = appDbContext.Tasks.Find(id);
+
+            if (task != null)
+            {
+                appDbContext.Remove(task);
+                appDbContext.SaveChanges();
+            }
+            else {
+                throw new Exception($"Task with id = {id} does not exist");
+            }
+
+            return task;
+        }
+
+        public Task Read(int id)
+        {
+            var task = appDbContext.Tasks.Find(id);
+            if (task == null) {
+                throw new Exception($"Task with id = {id} does not exist");
+            }
+            return task;
+        }
     }
 }
