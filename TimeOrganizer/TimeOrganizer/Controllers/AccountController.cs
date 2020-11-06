@@ -18,7 +18,9 @@ namespace TimeOrganizer.Controllers
         private ISchoolRepository schoolRepository;
         private SignInManager<ApplicationUser> signInManager;
 
-        public AccountController(UserManager<ApplicationUser> userManager, ISchoolRepository schoolRepository, SignInManager<ApplicationUser> signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager, 
+            ISchoolRepository schoolRepository, 
+            SignInManager<ApplicationUser> signInManager)
         {
             this.userManager = userManager;
             this.schoolRepository = schoolRepository;
@@ -92,7 +94,19 @@ namespace TimeOrganizer.Controllers
 
                     if (result.Succeeded)
                     {
-                        return new JsonResult(new { Message = "success" });
+                        var createRoleResult = await userManager.AddToRoleAsync(user, "User");
+
+                        if (createRoleResult.Succeeded)
+                        {
+                            return new JsonResult(new { Message = "success" });
+                        }
+                        else {
+                            foreach (var error in createRoleResult.Errors)
+                            {
+                                ModelState.AddModelError(string.Empty, error.Description);
+                            }
+
+                        }
                     }
                     else
                     {
