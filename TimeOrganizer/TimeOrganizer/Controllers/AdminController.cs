@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TimeOrganizer.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [Route("admin")]
     public class AdminController : Controller
     {
