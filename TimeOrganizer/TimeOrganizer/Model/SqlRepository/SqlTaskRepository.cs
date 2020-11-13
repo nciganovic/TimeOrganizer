@@ -50,31 +50,7 @@ namespace TimeOrganizer.Model.SqlRepository
             return task;
         }
 
-        public IEnumerable<TaskDto> Read(string searchingUserId, DateTime startTime, DateTime endTime)
-        {
-            var data = appDbContext.Tasks.Join(appDbContext.ApplicationUserTask, 
-                x => x.Id, 
-                y => y.TaskId, 
-                (x, y) => new TaskDto { 
-                    Id = x.Id,
-                    ColorName = x.Color.Name,
-                    StartTime = x.StartTime,
-                    EndTime = x.EndTime,
-                    Description = x.Description,
-                    Priority = x.Priority,
-                    TaskTypeName = x.TaskType.Name,
-                    Title = x.Title,
-                    SearchingUserId = y.ApplicationUserId,
-                    TaskCreatorUsername = x.ApplicationUser.UserName
-                })
-                .Where(x => x.SearchingUserId == searchingUserId && startTime <= x.StartTime && endTime >= x.EndTime)
-                .OrderBy(x => x.StartTime)
-                .ToList();
-
-            return data;
-        }
-
-        public IEnumerable<TaskDto> Read(string searchingUserId, DateTime startTime, DateTime endTime, int excludeTaskId)
+        public IEnumerable<TaskDto> Read(string searchingUserId, DateTime startTime, DateTime endTime, int excludeTaskId = -1)
         {
             var data = appDbContext.Tasks.Join(appDbContext.ApplicationUserTask, 
                 x => x.Id, 

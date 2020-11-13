@@ -1,6 +1,5 @@
 C:\Users\nikol\Documents\Github\TimeOrganizer\TimeOrganizer\TimeOrganizer\bin\Debug\netcoreapp3.1\appsettings.Development.json
 C:\Users\nikol\Documents\Github\TimeOrganizer\TimeOrganizer\TimeOrganizer\bin\Debug\netcoreapp3.1\appsettings.json
-C:\Users\nikol\Documents\Github\TimeOrganizer\TimeOrganizer\TimeOrganizer\bin\Debug\netcoreapp3.1\Properties\launchSettings.json
 C:\Users\nikol\Documents\Github\TimeOrganizer\TimeOrganizer\TimeOrganizer\bin\Debug\netcoreapp3.1\TimeOrganizer.exe
 C:\Users\nikol\Documents\Github\TimeOrganizer\TimeOrganizer\TimeOrganizer\bin\Debug\netcoreapp3.1\TimeOrganizer.deps.json
 C:\Users\nikol\Documents\Github\TimeOrganizer\TimeOrganizer\TimeOrganizer\bin\Debug\netcoreapp3.1\TimeOrganizer.runtimeconfig.json
@@ -71,3 +70,4 @@ C:\Users\nikol\Documents\Github\TimeOrganizer\TimeOrganizer\TimeOrganizer\bin\De
 C:\Users\nikol\Documents\Github\TimeOrganizer\TimeOrganizer\TimeOrganizer\obj\Debug\netcoreapp3.1\TimeOrganizer.csproj.CoreCompileInputs.cache
 C:\Users\nikol\Documents\Github\TimeOrganizer\TimeOrganizer\TimeOrganizer\obj\Debug\netcoreapp3.1\TimeOrganizer.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\nikol\Documents\Github\TimeOrganizer\TimeOrganizer\TimeOrganizer\obj\Debug\netcoreapp3.1\TimeOrganizer.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\nikol\Documents\Github\TimeOrganizer\TimeOrganizer\TimeOrganizer\obj\Debug\netcoreapp3.1\scopedcss\bundle\TimeOrganizer.styles.css
