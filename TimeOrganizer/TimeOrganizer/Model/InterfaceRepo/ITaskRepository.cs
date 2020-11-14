@@ -9,7 +9,7 @@ namespace TimeOrganizer.Model.InterfaceRepo
 {
     public interface ITaskRepository
     {
-        public Task Read(string authorId, int taskId);
+        public Task Read(string applicaitonUserId, int taskId);
         public IEnumerable<TaskDto> Read(string authorId, DateTime startTime, DateTime endTime, int excludeTaskId = -1);
         public Task Create(CreateTaskViewModel createTaskViewModel);
         public bool CheckDateBounds(IEnumerable<TaskDto> tasks, DateTime taskStartTime, DateTime taskEndTime);
