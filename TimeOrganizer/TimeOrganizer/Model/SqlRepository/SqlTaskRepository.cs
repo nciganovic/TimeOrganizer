@@ -131,5 +131,110 @@ namespace TimeOrganizer.Model.SqlRepository
 
             return task;
         }
+
+        public IList<DateGroupByDto> ReadGroupByDateExtended(string searchingUserId, DateTime startTime, DateTime endTime)
+        {
+            var data = appDbContext.Tasks.Join(appDbContext.ApplicationUserTask,
+                x => x.Id,
+                y => y.TaskId,
+                (x, y) => new TaskDto
+                {
+                    Id = x.Id,
+                    ColorName = x.Color.Name,
+                    StartTime = x.StartTime,
+                    EndTime = x.EndTime,
+                    Description = x.Description,
+                    Priority = x.Priority,
+                    TaskTypeName = x.TaskType.Name,
+                    Title = x.Title,
+                    SearchingUserId = y.ApplicationUserId,
+                    TaskCreatorUsername = x.ApplicationUser.UserName
+                })
+                .Where(x => x.SearchingUserId == searchingUserId && startTime <= x.StartTime && endTime >= x.EndTime)
+                .OrderBy(x => x.StartTime)
+                .ToList();
+
+            IList<DateGroupByDto> list = data
+                .Select(x => new TaskDto
+                {
+                    Id = x.Id,
+                    ColorName = x.ColorName,
+                    SearchingUserId = x.SearchingUserId,
+                    StartTime = x.StartTime,
+                    EndTime = x.EndTime,
+                    Description = x.Description,
+                    Priority = x.Priority,
+                    TaskCreatorUsername = x.TaskCreatorUsername,
+                    TaskTypeName = x.TaskTypeName,
+                    Title = x.Title
+                })
+                .GroupBy(x => x.StartTime.Date)
+                .Select(x => new DateGroupByDto{ 
+                    Count = x.Count(),
+                    Date = x.Key,
+                    Tasks = x.Select(y => new TaskDto {
+                        Id = y.Id,
+                        ColorName = y.ColorName,
+                        SearchingUserId = y.SearchingUserId,
+                        StartTime = y.StartTime,
+                        EndTime = y.EndTime,
+                        Description = y.Description,
+                        Priority = y.Priority,
+                        TaskCreatorUsername = y.TaskCreatorUsername,
+                        TaskTypeName = y.TaskTypeName,
+                        Title = y.Title
+                    })
+                })
+                .ToList();
+
+            return list;
+        }
+
+        public IList<DateGroupByDto> ReadGroupByDate(string searchingUserId, DateTime startTime, DateTime endTime)
+        {
+            var data = appDbContext.Tasks.Join(appDbContext.ApplicationUserTask,
+                x => x.Id,
+                y => y.TaskId,
+                (x, y) => new TaskDto
+                {
+                    Id = x.Id,
+                    ColorName = x.Color.Name,
+                    StartTime = x.StartTime,
+                    EndTime = x.EndTime,
+                    Description = x.Description,
+                    Priority = x.Priority,
+                    TaskTypeName = x.TaskType.Name,
+                    Title = x.Title,
+                    SearchingUserId = y.ApplicationUserId,
+                    TaskCreatorUsername = x.ApplicationUser.UserName
+                })
+                .Where(x => x.SearchingUserId == searchingUserId && startTime <= x.StartTime && endTime >= x.EndTime)
+                .OrderBy(x => x.StartTime)
+                .ToList();
+
+            IList<DateGroupByDto> list = data
+                .Select(x => new TaskDto
+                {
+                    Id = x.Id,
+                    ColorName = x.ColorName,
+                    SearchingUserId = x.SearchingUserId,
+                    StartTime = x.StartTime,
+                    EndTime = x.EndTime,
+                    Description = x.Description,
+                    Priority = x.Priority,
+                    TaskCreatorUsername = x.TaskCreatorUsername,
+                    TaskTypeName = x.TaskTypeName,
+                    Title = x.Title
+                })
+                .GroupBy(x => x.StartTime.Date)
+                .Select(x => new DateGroupByDto
+                {
+                    Count = x.Count(),
+                    Date = x.Key,
+                })
+                .ToList();
+
+            return list;
+        }
     }
 }

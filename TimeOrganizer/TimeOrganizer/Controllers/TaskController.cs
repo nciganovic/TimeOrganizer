@@ -159,5 +159,14 @@ namespace TimeOrganizer.Controllers
             return new JsonResult(new { errors = invalidModelStateError });
         }
 
+        [HttpGet]
+        [Route("task/group")]
+        public async Task<IActionResult> ReadGroupBy(DateTime startTime, DateTime endTime)
+        {
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            var data = taskRepository.ReadGroupByDate(user.Id, startTime, endTime);
+            return new JsonResult(data);
+        }
+
     }
 }
