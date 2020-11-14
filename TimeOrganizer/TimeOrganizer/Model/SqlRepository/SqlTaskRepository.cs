@@ -39,15 +39,18 @@ namespace TimeOrganizer.Model.SqlRepository
 
         public Task Read(string applicaitonUserId, int taskId)
         {
-            var task = appDbContext.Tasks.Find(taskId);
+            ApplicationUserTask appTask = appDbContext.ApplicationUserTask.Where(x => x.TaskId == taskId && x.ApplicationUserId == applicaitonUserId).FirstOrDefault();
 
-            if (task != null) {
-                if (task.ApplicationUserId != applicaitonUserId) {
-                    return null;
-                }    
+            if (appTask != null)
+            {
+                var task = appDbContext.Tasks.Find(taskId);
+                return task;
+            }
+            else {
+                return null;
             }
 
-            return task;
+            
         }
 
         public IEnumerable<TaskDto> Read(string searchingUserId, DateTime startTime, DateTime endTime, int excludeTaskId = -1)
