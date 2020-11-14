@@ -37,9 +37,9 @@ namespace TimeOrganizer.Model.SqlRepository
             return task;
         }
 
-        public Task Read(string applicaitonUserId, int taskId)
+        public Task Read(string applicationUserId, int taskId)
         {
-            ApplicationUserTask appTask = appDbContext.ApplicationUserTask.Where(x => x.TaskId == taskId && x.ApplicationUserId == applicaitonUserId).FirstOrDefault();
+            ApplicationUserTask appTask = appDbContext.ApplicationUserTask.Where(x => x.TaskId == taskId && x.ApplicationUserId == applicationUserId).FirstOrDefault();
 
             if (appTask != null)
             {
@@ -53,7 +53,7 @@ namespace TimeOrganizer.Model.SqlRepository
             
         }
 
-        public IEnumerable<TaskDto> Read(string searchingUserId, DateTime startTime, DateTime endTime, int excludeTaskId = -1)
+        public IEnumerable<TaskDto> Read(string applicationUserId, DateTime startTime, DateTime endTime, int excludeTaskId = -1)
         {
             var data = appDbContext.Tasks.Join(appDbContext.ApplicationUserTask, 
                 x => x.Id, 
@@ -67,10 +67,11 @@ namespace TimeOrganizer.Model.SqlRepository
                     Priority = x.Priority,
                     TaskTypeName = x.TaskType.Name,
                     Title = x.Title,
-                    SearchingUserId = y.ApplicationUserId,
-                    TaskCreatorUsername = x.ApplicationUser.UserName
+                    ApplicationUserId = y.ApplicationUserId,
+                    TaskCreatorUsername = x.ApplicationUser.UserName,
+                    TotalUsersCount = x.ApplicationUserTasks.Count()
                 })
-                .Where(x => x.SearchingUserId == searchingUserId && startTime <= x.StartTime && endTime >= x.EndTime && x.Id != excludeTaskId)
+                .Where(x => x.ApplicationUserId == applicationUserId && startTime <= x.StartTime && endTime >= x.EndTime && x.Id != excludeTaskId)
                 .OrderBy(x => x.StartTime)
                 .ToList();
 
@@ -135,7 +136,7 @@ namespace TimeOrganizer.Model.SqlRepository
             return task;
         }
 
-        public IList<DateGroupByDto> ReadGroupByDateExtended(string searchingUserId, DateTime startTime, DateTime endTime)
+        public IList<DateGroupByDto> ReadGroupByDateExtended(string applicationUserId, DateTime startTime, DateTime endTime)
         {
             var data = appDbContext.Tasks.Join(appDbContext.ApplicationUserTask,
                 x => x.Id,
@@ -150,10 +151,10 @@ namespace TimeOrganizer.Model.SqlRepository
                     Priority = x.Priority,
                     TaskTypeName = x.TaskType.Name,
                     Title = x.Title,
-                    SearchingUserId = y.ApplicationUserId,
+                    ApplicationUserId = y.ApplicationUserId,
                     TaskCreatorUsername = x.ApplicationUser.UserName
                 })
-                .Where(x => x.SearchingUserId == searchingUserId && startTime <= x.StartTime && endTime >= x.EndTime)
+                .Where(x => x.ApplicationUserId == applicationUserId && startTime <= x.StartTime && endTime >= x.EndTime)
                 .OrderBy(x => x.StartTime)
                 .ToList();
 
@@ -162,7 +163,7 @@ namespace TimeOrganizer.Model.SqlRepository
                 {
                     Id = x.Id,
                     ColorName = x.ColorName,
-                    SearchingUserId = x.SearchingUserId,
+                    ApplicationUserId = x.ApplicationUserId,
                     StartTime = x.StartTime,
                     EndTime = x.EndTime,
                     Description = x.Description,
@@ -178,7 +179,7 @@ namespace TimeOrganizer.Model.SqlRepository
                     Tasks = x.Select(y => new TaskDto {
                         Id = y.Id,
                         ColorName = y.ColorName,
-                        SearchingUserId = y.SearchingUserId,
+                        ApplicationUserId = y.ApplicationUserId,
                         StartTime = y.StartTime,
                         EndTime = y.EndTime,
                         Description = y.Description,
@@ -193,7 +194,7 @@ namespace TimeOrganizer.Model.SqlRepository
             return list;
         }
 
-        public IList<DateGroupByDto> ReadGroupByDate(string searchingUserId, DateTime startTime, DateTime endTime)
+        public IList<DateGroupByDto> ReadGroupByDate(string applicationUserId, DateTime startTime, DateTime endTime)
         {
             var data = appDbContext.Tasks.Join(appDbContext.ApplicationUserTask,
                 x => x.Id,
@@ -208,10 +209,10 @@ namespace TimeOrganizer.Model.SqlRepository
                     Priority = x.Priority,
                     TaskTypeName = x.TaskType.Name,
                     Title = x.Title,
-                    SearchingUserId = y.ApplicationUserId,
+                    ApplicationUserId = y.ApplicationUserId,
                     TaskCreatorUsername = x.ApplicationUser.UserName
                 })
-                .Where(x => x.SearchingUserId == searchingUserId && startTime <= x.StartTime && endTime >= x.EndTime)
+                .Where(x => x.ApplicationUserId == applicationUserId && startTime <= x.StartTime && endTime >= x.EndTime)
                 .OrderBy(x => x.StartTime)
                 .ToList();
 
@@ -220,7 +221,7 @@ namespace TimeOrganizer.Model.SqlRepository
                 {
                     Id = x.Id,
                     ColorName = x.ColorName,
-                    SearchingUserId = x.SearchingUserId,
+                    ApplicationUserId = x.ApplicationUserId,
                     StartTime = x.StartTime,
                     EndTime = x.EndTime,
                     Description = x.Description,

@@ -15,7 +15,8 @@ namespace TimeOrganizer.Model.Dto
         public int Priority { get; set; }
         public string ColorName { get; set; }
         public string TaskTypeName { get; set; }
-        public string SearchingUserId { get; set; }
+        public string ApplicationUserId { get; set; }
         public string TaskCreatorUsername { get; set; }
+        public int TotalUsersCount { get; set; }
     }
 }
