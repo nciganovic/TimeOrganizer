@@ -16,6 +16,8 @@ namespace TimeOrganizer.Model.SqlRepository
 
         public bool SendRequest(string sendingUserId, string recivingUserId)
         {
+            //TODO check if this realtionship already exist but in reverse
+
             RelationshipStatus relationshipStatus = appDbContext.RelationshipStatuses.Where(x => x.Name == "Pending").FirstOrDefault();
 
             UserRelationship userRelationship = new UserRelationship
