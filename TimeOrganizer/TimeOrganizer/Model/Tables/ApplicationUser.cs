@@ -20,5 +20,8 @@ namespace TimeOrganizer.Model.Tables
         public List<ApplicationUserTask> ApplicationUserTasks { get; set; }
     
         public List<Task> Tasks { get; set; }
+
+        public List<UserRelationship> UserRelationships1 { get; set; }
+        public List<UserRelationship> UserRelationships2 { get; set; }
     }
 }
