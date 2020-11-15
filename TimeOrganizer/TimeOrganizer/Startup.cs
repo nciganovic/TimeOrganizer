@@ -44,6 +44,7 @@ namespace TimeOrganizer
             services.AddScoped<ITaskTypeRepository, SqlTaskTypeRepository>();
             services.AddScoped<IColorRepository, SqlColorRepository>();
             services.AddScoped<IApplicationUserTaskRepository, SqlApplicationUserTaskRepository>();
+            services.AddScoped<IUserRelationshipRepository, SqlUserRelationshipRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
