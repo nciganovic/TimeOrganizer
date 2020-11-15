@@ -26,8 +26,29 @@ namespace TimeOrganizer.Controllers
         [Route("request/send")]
         public async Task<IActionResult> SendFriendRequest(string recivingUserId) {
             var user = await userManager.FindByNameAsync(User.Identity.Name);
-            userRelationshipRepository.SendRequest(user.Id, recivingUserId);
-            return new JsonResult(new { message = "success" });
+
+            if (user != null && recivingUserId != null)
+            {
+                bool result = userRelationshipRepository.SendRequest(user.Id, recivingUserId);
+                if (result) { 
+                    return new JsonResult(new { message = "success" });
+                }
+                else
+                {
+                    return new JsonResult(new { message = "failed to send friend request" });
+                }
+            }
+            else {
+                if (user == null) {
+                    ModelState.AddModelError(string.Empty, "User is null");
+                }
+                if (recivingUserId == null) {
+                    ModelState.AddModelError(string.Empty, "recivingUserId value is null");
+                }
+            }
+
+            var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            return new JsonResult(new { errors = invalidModelStateError });
         }
 
     }

@@ -1,6 +1,7 @@
-﻿using TimeOrganizer.Model.InterfaceRepo;
-using TimeOrganizer.Model.Tables;
+﻿using System;
 using System.Linq;
+using TimeOrganizer.Model.InterfaceRepo;
+using TimeOrganizer.Model.Tables;
 
 namespace TimeOrganizer.Model.SqlRepository
 {
@@ -24,9 +25,16 @@ namespace TimeOrganizer.Model.SqlRepository
                 RelationshipStatusId = relationshipStatus.Id
             };
 
-            appDbContext.UserRelationships.Add(userRelationship);
-            appDbContext.SaveChanges();
-            
+            try
+            {
+                appDbContext.UserRelationships.Add(userRelationship);
+                appDbContext.SaveChanges();
+            }
+            catch(Exception exp) {
+                //Log exception
+                return false;
+            }
+
             return true;
         }
     }
