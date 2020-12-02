@@ -29,13 +29,21 @@ namespace TimeOrganizer.Controllers
 
             if (user != null && recivingUserId != null)
             {
-                bool result = userRelationshipRepository.SendRequest(user.Id, recivingUserId);
-                if (result) { 
-                    return new JsonResult(new { message = "success" });
-                }
-                else
+                try
                 {
-                    return new JsonResult(new { message = "failed to send friend request" });
+                    bool result = userRelationshipRepository.SendRequest(user.Id, recivingUserId);
+
+                    if (result)
+                    {
+                        return new JsonResult(new { message = "success" });
+                    }
+                    else
+                    {
+                        return new JsonResult(new { message = "failed to send friend request" });
+                    }
+                }
+                catch (Exception e) {
+                    ModelState.AddModelError(string.Empty, e.Message);
                 }
             }
             else {
