@@ -59,5 +59,10 @@ namespace TimeOrganizer.Controllers
             return new JsonResult(new { errors = invalidModelStateError });
         }
 
+        //TODO get list of sent request that are pending 
+        //TOOD get list of recived requests that are pending 
+        //TODO accept request
+        //TODO reject request
+
     }
 }
