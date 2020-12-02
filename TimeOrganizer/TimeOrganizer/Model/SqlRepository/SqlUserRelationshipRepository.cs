@@ -16,6 +16,12 @@ namespace TimeOrganizer.Model.SqlRepository
 
         public bool SendRequest(string sendingUserId, string recivingUserId)
         {
+            //Check if user is sending request to himself
+            if (sendingUserId == recivingUserId)
+            {
+                throw new Exception("You cannot send yourself request");
+            }
+
             //Check if this realtionship already exist but in reverse
             var checkIfRelationshipExists = appDbContext.UserRelationships.Where(x => x.ApplicationUserId_Reciver == sendingUserId && x.ApplicationUserId_Sender == recivingUserId).FirstOrDefault();
             if (checkIfRelationshipExists != null) {
