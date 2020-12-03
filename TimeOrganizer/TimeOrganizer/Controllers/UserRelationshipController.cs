@@ -199,6 +199,7 @@ namespace TimeOrganizer.Controllers
             return new JsonResult(new { errors = invalidModelStateError });
         }
 
+        //Read all accepted requests aka list of friends
         [HttpGet]
         [Route("requests/accepted")]
         public async Task<IActionResult> ReadAcceptedRequests() {
@@ -219,6 +220,48 @@ namespace TimeOrganizer.Controllers
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
             return new JsonResult(new { errors = invalidModelStateError });
-        } 
+        }
+
+        [HttpPost]
+        [Route("request/remove")]
+        public async Task<IActionResult> RemoveAcceptedRelationship(string userIdToDelete)
+        {
+            var currentUser = await userManager.FindByNameAsync(User.Identity.Name);
+
+            if (currentUser.Id != null && userIdToDelete != null)
+            {
+                try
+                {
+                    var result = userRelationshipRepository.DeleteAcceptedRequest(currentUser.Id, userIdToDelete);
+
+                    if (result)
+                    {
+                        return new JsonResult(new { message = "Friend removed successfully" });
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Failed to remove friend");
+                    }
+                }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError(string.Empty, e.Message);
+                }
+            }
+            else
+            {
+                if (currentUser == null)
+                {
+                    ModelState.AddModelError(string.Empty, "currentUser is null");
+                }
+                if (userIdToDelete == null)
+                {
+                    ModelState.AddModelError(string.Empty, "userIdToDelete value is null");
+                }
+            }
+
+            var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            return new JsonResult(new { errors = invalidModelStateError });
+        }
     }
 }

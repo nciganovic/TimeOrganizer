@@ -12,6 +12,6 @@ namespace TimeOrganizer.Model.InterfaceRepo
         public bool AcceptRequest(string sendingUserId, string recivingUserId);
         public bool RejectRequest(string sendingUserId, string recivingUserId);
         public IEnumerable<ApplicationUserDto> ReadAcceptedRequests(string userId);
-
+        public bool DeleteAcceptedRequest(string userId_1, string userId_2);
     }
 }

@@ -42,6 +42,24 @@ namespace TimeOrganizer.Model.SqlRepository
             return true;
         }
 
+        public bool DeleteAcceptedRequest(string userId_1, string userId_2)
+        {
+            var requests = appDbContext.UserRelationships
+                .Where(x => (x.ApplicationUserId_Sender == userId_1 && x.ApplicationUserId_Reciver == userId_2)
+                || (x.ApplicationUserId_Sender == userId_2 && x.ApplicationUserId_Reciver == userId_1)
+                && x.RelationshipStatus.Name == "Accepted")
+                .FirstOrDefault();
+
+            if (requests == null) {
+                throw new Exception($"Relationship between {userId_1} and {userId_2} does not exist");
+            }
+
+            appDbContext.UserRelationships.Remove(requests);
+            appDbContext.SaveChanges();
+
+            return true;
+        }
+
         public IEnumerable<ApplicationUserDto> ReadAcceptedRequests(string userId)
         {
             var requests = appDbContext.UserRelationships
