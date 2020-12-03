@@ -18,14 +18,20 @@ namespace TimeOrganizer.Model.SqlRepository
 
         public bool AcceptRequest(string sendingUserId, string recivingUserId)
         {
-            var request = appDbContext.UserRelationships.Where(x => x.ApplicationUserId_Sender == sendingUserId && x.ApplicationUserId_Reciver == recivingUserId).FirstOrDefault();
+            var request = appDbContext.UserRelationships
+                .Where(x => x.ApplicationUserId_Sender == sendingUserId 
+                && x.ApplicationUserId_Reciver == recivingUserId
+                && x.RelationshipStatus.Name == "Pending")
+                .FirstOrDefault();
 
             if (request == null)
             {
-                throw new Exception($"Request between {sendingUserId} and {recivingUserId} does not exist");
+                throw new Exception($"Pending request between {sendingUserId} and {recivingUserId} does not exist");
             }
             
-            RelationshipStatus acceptStatus = appDbContext.RelationshipStatuses.Where(x => x.Name == "Accepted").FirstOrDefault();
+            RelationshipStatus acceptStatus = appDbContext.RelationshipStatuses
+                .Where(x => x.Name == "Accepted")
+                .FirstOrDefault();
 
             request.RelationshipStatusId = acceptStatus.Id;
 
@@ -38,7 +44,9 @@ namespace TimeOrganizer.Model.SqlRepository
 
         public IEnumerable<ApplicationUserDto> ReadRecivedRequests(string userId)
         {
-            var requests = appDbContext.UserRelationships.Where(x => x.ApplicationUserId_Reciver == userId);
+            var requests = appDbContext.UserRelationships
+                .Where(x => x.ApplicationUserId_Reciver == userId 
+                && x.RelationshipStatus.Name == "Pending");
 
             var data = requests.Select(x => new ApplicationUserDto
             {
@@ -51,7 +59,9 @@ namespace TimeOrganizer.Model.SqlRepository
 
         public IEnumerable<ApplicationUserDto> ReadSentRequests(string userId)
         {
-            var requests = appDbContext.UserRelationships.Where(x => x.ApplicationUserId_Sender == userId);
+            var requests = appDbContext.UserRelationships
+                .Where(x => x.ApplicationUserId_Sender == userId 
+                && x.RelationshipStatus.Name == "Pending");
             
             var data = requests.Select(x => new ApplicationUserDto { 
                 Id = x.ApplicationUser_Reciver.Id,
@@ -63,11 +73,15 @@ namespace TimeOrganizer.Model.SqlRepository
 
         public bool RejectRequest(string sendingUserId, string recivingUserId)
         {
-            var request = appDbContext.UserRelationships.Where(x => x.ApplicationUserId_Sender == sendingUserId && x.ApplicationUserId_Reciver == recivingUserId).FirstOrDefault();
+            var request = appDbContext.UserRelationships
+                .Where(x => x.ApplicationUserId_Sender == sendingUserId 
+                && x.ApplicationUserId_Reciver == recivingUserId 
+                && x.RelationshipStatus.Name == "Pending")
+                .FirstOrDefault();
 
             if (request == null)
             {
-                throw new Exception($"Request between {sendingUserId} and {recivingUserId} does not exist");
+                throw new Exception($"Pending request between {sendingUserId} and {recivingUserId} does not exist");
             }
 
             appDbContext.UserRelationships.Remove(request);
@@ -85,7 +99,11 @@ namespace TimeOrganizer.Model.SqlRepository
             }
 
             //Check if this realtionship already exist but in reverse
-            var checkIfRelationshipExists = appDbContext.UserRelationships.Where(x => x.ApplicationUserId_Reciver == sendingUserId && x.ApplicationUserId_Sender == recivingUserId).FirstOrDefault();
+            var checkIfRelationshipExists = appDbContext.UserRelationships
+                .Where(x => x.ApplicationUserId_Reciver == sendingUserId
+                && x.ApplicationUserId_Sender == recivingUserId)
+                .FirstOrDefault();
+
             if (checkIfRelationshipExists != null) {
                 throw new Exception("Relationship already exists");
             }
