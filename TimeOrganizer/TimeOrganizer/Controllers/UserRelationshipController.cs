@@ -25,7 +25,8 @@ namespace TimeOrganizer.Controllers
 
         [HttpPost]
         [Route("request/send")]
-        public async Task<IActionResult> SendFriendRequest(string recivingUserId) {
+        public async Task<IActionResult> SendFriendRequest(string recivingUserId)
+        {
             var user = await userManager.FindByNameAsync(User.Identity.Name);
 
             if (user != null && recivingUserId != null)
@@ -43,15 +44,19 @@ namespace TimeOrganizer.Controllers
                         return new JsonResult(new { message = "failed to send friend request" });
                     }
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     ModelState.AddModelError(string.Empty, e.Message);
                 }
             }
-            else {
-                if (user == null) {
+            else
+            {
+                if (user == null)
+                {
                     ModelState.AddModelError(string.Empty, "User is null");
                 }
-                if (recivingUserId == null) {
+                if (recivingUserId == null)
+                {
                     ModelState.AddModelError(string.Empty, "recivingUserId value is null");
                 }
             }
@@ -63,16 +68,19 @@ namespace TimeOrganizer.Controllers
         //Get list of sent request that are pending 
         [HttpGet]
         [Route("requests/read/sent")]
-        public async Task<IActionResult> ReadSentFriendRequests() {
+        public async Task<IActionResult> ReadSentFriendRequests()
+        {
             var user = await userManager.FindByNameAsync(User.Identity.Name);
 
-            if (user != null) {
+            if (user != null)
+            {
                 try
                 {
                     IEnumerable<ApplicationUserDto> userList = userRelationshipRepository.ReadSentRequests(user.Id);
                     return new JsonResult(new { userList = userList });
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     ModelState.AddModelError(string.Empty, e.Message);
                 }
             }
@@ -84,10 +92,12 @@ namespace TimeOrganizer.Controllers
         //Get list of recived requests that are pending 
         [HttpGet]
         [Route("requests/read/recived")]
-        public async Task<IActionResult> ReadRecivedFriendRequests() {
+        public async Task<IActionResult> ReadRecivedFriendRequests()
+        {
             var user = await userManager.FindByNameAsync(User.Identity.Name);
 
-            if (user != null) {
+            if (user != null)
+            {
                 try
                 {
                     IEnumerable<ApplicationUserDto> userList = userRelationshipRepository.ReadRecivedRequests(user.Id);
@@ -106,7 +116,8 @@ namespace TimeOrganizer.Controllers
         //Accept request
         [HttpPost]
         [Route("request/accept")]
-        public async Task<IActionResult> AcceptFriendRequest(string sendingUserId) {
+        public async Task<IActionResult> AcceptFriendRequest(string sendingUserId)
+        {
             var recivingUser = await userManager.FindByNameAsync(User.Identity.Name);
 
             if (recivingUser.Id != null && sendingUserId != null)
@@ -119,19 +130,22 @@ namespace TimeOrganizer.Controllers
                     {
                         return new JsonResult(new { message = "Friend request accepted successfully" });
                     }
-                    else {
+                    else
+                    {
                         ModelState.AddModelError(string.Empty, "Failed to accept request");
                     }
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     ModelState.AddModelError(string.Empty, e.Message);
                 }
 
             }
-            else {
+            else
+            {
                 if (recivingUser == null)
                 {
-                    ModelState.AddModelError(string.Empty, "User is null");
+                    ModelState.AddModelError(string.Empty, "recivingUser is null");
                 }
                 if (sendingUserId == null)
                 {
@@ -143,7 +157,46 @@ namespace TimeOrganizer.Controllers
             return new JsonResult(new { errors = invalidModelStateError });
         }
 
-        //TODO reject request
+        //Reject request
+        [HttpPost]
+        [Route("request/reject")]
+        public async Task<IActionResult> RejectFriendRequest(string sendingUserId)
+        {
+            var recivingUser = await userManager.FindByNameAsync(User.Identity.Name);
 
+            if (recivingUser.Id != null && sendingUserId != null) {
+                try
+                {
+                    var result = userRelationshipRepository.RejectRequest(sendingUserId, recivingUser.Id);
+
+                    if (result)
+                    {
+                        return new JsonResult(new { message = "Friend request rejected successfully" });
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Failed to reject request");
+                    }
+                }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError(string.Empty, e.Message);
+                }
+            }
+            else
+            {
+                if (recivingUser == null)
+                {
+                    ModelState.AddModelError(string.Empty, "recivingUser is null");
+                }
+                if (sendingUserId == null)
+                {
+                    ModelState.AddModelError(string.Empty, "sendingUserId value is null");
+                }
+            }
+
+            var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            return new JsonResult(new { errors = invalidModelStateError });
+        }
     }
 }

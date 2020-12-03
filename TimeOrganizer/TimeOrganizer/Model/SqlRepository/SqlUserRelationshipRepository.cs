@@ -61,6 +61,21 @@ namespace TimeOrganizer.Model.SqlRepository
             return data;
         }
 
+        public bool RejectRequest(string sendingUserId, string recivingUserId)
+        {
+            var request = appDbContext.UserRelationships.Where(x => x.ApplicationUserId_Sender == sendingUserId && x.ApplicationUserId_Reciver == recivingUserId).FirstOrDefault();
+
+            if (request == null)
+            {
+                throw new Exception($"Request between {sendingUserId} and {recivingUserId} does not exist");
+            }
+
+            appDbContext.UserRelationships.Remove(request);
+            appDbContext.SaveChanges();
+
+            return true;
+        }
+
         public bool SendRequest(string sendingUserId, string recivingUserId)
         {
             //Check if user is sending request to himself
