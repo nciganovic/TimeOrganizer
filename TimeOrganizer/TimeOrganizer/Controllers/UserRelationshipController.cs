@@ -103,7 +103,46 @@ namespace TimeOrganizer.Controllers
             return new JsonResult(new { errors = invalidModelStateError });
         }
 
-        //TODO accept request
+        //Accept request
+        [HttpPost]
+        [Route("request/accept")]
+        public async Task<IActionResult> AcceptFriendRequest(string sendingUserId) {
+            var recivingUser = await userManager.FindByNameAsync(User.Identity.Name);
+
+            if (recivingUser.Id != null && sendingUserId != null)
+            {
+                try
+                {
+                    var result = userRelationshipRepository.AcceptRequest(sendingUserId, recivingUser.Id);
+
+                    if (result)
+                    {
+                        return new JsonResult(new { message = "Friend request accepted successfully" });
+                    }
+                    else {
+                        ModelState.AddModelError(string.Empty, "Failed to accept request");
+                    }
+                }
+                catch (Exception e) {
+                    ModelState.AddModelError(string.Empty, e.Message);
+                }
+
+            }
+            else {
+                if (recivingUser == null)
+                {
+                    ModelState.AddModelError(string.Empty, "User is null");
+                }
+                if (sendingUserId == null)
+                {
+                    ModelState.AddModelError(string.Empty, "sendingUserId value is null");
+                }
+            }
+
+            var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            return new JsonResult(new { errors = invalidModelStateError });
+        }
+
         //TODO reject request
 
     }

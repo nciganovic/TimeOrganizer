@@ -9,5 +9,6 @@ namespace TimeOrganizer.Model.InterfaceRepo
         public bool SendRequest(string sendingUserId, string recivingUserId);
         public IEnumerable<ApplicationUserDto> ReadSentRequests(string userId);
         public IEnumerable<ApplicationUserDto> ReadRecivedRequests(string userId);
+        public bool AcceptRequest(string sendingUserId, string recivingUserId);
     }
 }

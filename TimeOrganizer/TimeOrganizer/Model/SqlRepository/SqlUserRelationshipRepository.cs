@@ -16,6 +16,26 @@ namespace TimeOrganizer.Model.SqlRepository
             this.appDbContext = appDbContext;
         }
 
+        public bool AcceptRequest(string sendingUserId, string recivingUserId)
+        {
+            var request = appDbContext.UserRelationships.Where(x => x.ApplicationUserId_Sender == sendingUserId && x.ApplicationUserId_Reciver == recivingUserId).FirstOrDefault();
+
+            if (request == null)
+            {
+                throw new Exception($"Request between {sendingUserId} and {recivingUserId} does not exist");
+            }
+            
+            RelationshipStatus acceptStatus = appDbContext.RelationshipStatuses.Where(x => x.Name == "Accepted").FirstOrDefault();
+
+            request.RelationshipStatusId = acceptStatus.Id;
+
+            var editRequest = appDbContext.UserRelationships.Attach(request);
+            editRequest.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            appDbContext.SaveChanges();
+
+            return true;
+        }
+
         public IEnumerable<ApplicationUserDto> ReadRecivedRequests(string userId)
         {
             var requests = appDbContext.UserRelationships.Where(x => x.ApplicationUserId_Reciver == userId);
@@ -55,13 +75,13 @@ namespace TimeOrganizer.Model.SqlRepository
                 throw new Exception("Relationship already exists");
             }
 
-            RelationshipStatus relationshipStatus = appDbContext.RelationshipStatuses.Where(x => x.Name == "Pending").FirstOrDefault();
+            RelationshipStatus pendingStatus = appDbContext.RelationshipStatuses.Where(x => x.Name == "Pending").FirstOrDefault();
 
             UserRelationship userRelationship = new UserRelationship
             {
                 ApplicationUserId_Sender = sendingUserId,
                 ApplicationUserId_Reciver = recivingUserId,
-                RelationshipStatusId = relationshipStatus.Id
+                RelationshipStatusId = pendingStatus.Id
             };
 
             try
