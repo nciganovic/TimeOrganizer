@@ -42,6 +42,41 @@ namespace TimeOrganizer.Model.SqlRepository
             return true;
         }
 
+        public IEnumerable<ApplicationUserDto> ReadAcceptedRequests(string userId)
+        {
+            var requests = appDbContext.UserRelationships
+                .Where(x => (x.ApplicationUserId_Reciver == userId 
+                || x.ApplicationUserId_Sender == userId)
+                && x.RelationshipStatus.Name == "Accepted").ToList();
+
+            List<ApplicationUserDto> userList = new List<ApplicationUserDto>();
+
+            foreach(var r in requests)
+            {
+                if (r.ApplicationUserId_Sender != userId)
+                {
+                    ApplicationUserDto applicationUser = new ApplicationUserDto
+                    {
+                        Id = r.ApplicationUserId_Sender,
+                        Username = appDbContext.ApplicationUsers.Find(r.ApplicationUserId_Sender).UserName
+                    };
+                    userList.Add(applicationUser);
+                }
+                else {
+                    //For some reason r.ApplicaitonUser_Reciver returns null
+                    
+                    ApplicationUserDto applicationUser = new ApplicationUserDto
+                    {
+                        Id = r.ApplicationUserId_Reciver,
+                        Username = appDbContext.ApplicationUsers.Find(r.ApplicationUserId_Reciver).UserName
+                    };
+                    userList.Add(applicationUser);
+                }
+            }
+
+            return userList;
+        }
+
         public IEnumerable<ApplicationUserDto> ReadRecivedRequests(string userId)
         {
             var requests = appDbContext.UserRelationships

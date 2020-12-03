@@ -16,6 +16,7 @@ namespace TimeOrganizer.Model
         public DbSet<TaskType> TaskTypes { get; set; }
         public DbSet<Color> Colors { get; set; }
         public DbSet<Task> Tasks { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<ApplicationUserTask> ApplicationUserTask { get; set; }
         public DbSet<RelationshipStatus> RelationshipStatuses { get; set; }
         public DbSet<UserRelationship> UserRelationships { get; set; }

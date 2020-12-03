@@ -198,5 +198,27 @@ namespace TimeOrganizer.Controllers
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
             return new JsonResult(new { errors = invalidModelStateError });
         }
+
+        [HttpGet]
+        [Route("requests/accepted")]
+        public async Task<IActionResult> ReadAcceptedRequests() {
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+
+            if (user != null)
+            {
+                try
+                {
+                    IEnumerable<ApplicationUserDto> userList = userRelationshipRepository.ReadAcceptedRequests(user.Id);
+                    return new JsonResult(new { userList = userList });
+                }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError(string.Empty, e.Message);
+                }
+            }
+
+            var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            return new JsonResult(new { errors = invalidModelStateError });
+        } 
     }
 }
