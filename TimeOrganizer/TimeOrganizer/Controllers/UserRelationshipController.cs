@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TimeOrganizer.Model.Tables;
 using TimeOrganizer.Model.InterfaceRepo;
+using TimeOrganizer.Model.Dto;
 
 namespace TimeOrganizer.Controllers
 {
@@ -59,7 +60,21 @@ namespace TimeOrganizer.Controllers
             return new JsonResult(new { errors = invalidModelStateError });
         }
 
-        //TODO get list of sent request that are pending 
+        //Get list of sent request that are pending 
+        [HttpGet]
+        [Route("requests/read/sent")]
+        public async Task<IActionResult> ReadSentFriendRequests() {
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+
+            if (user != null) {
+                IEnumerable<ApplicationUserDto> userList = userRelationshipRepository.ReadSentRequests(user.Id);
+                return new JsonResult(new { userList = userList });
+            }
+
+            var invalidModelStateErrror = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            return new JsonResult(new { errors = invalidModelStateErrror });
+        }
+
         //TOOD get list of recived requests that are pending 
         //TODO accept request
         //TODO reject request

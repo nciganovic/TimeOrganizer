@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using TimeOrganizer.Model.Dto;
 using TimeOrganizer.Model.InterfaceRepo;
 using TimeOrganizer.Model.Tables;
 
@@ -12,6 +14,18 @@ namespace TimeOrganizer.Model.SqlRepository
         public SqlUserRelationshipRepository(AppDbContext appDbContext)
         {
             this.appDbContext = appDbContext;
+        }
+
+        public IEnumerable<ApplicationUserDto> ReadSentRequests(string userId)
+        {
+            var requests = appDbContext.UserRelationships.Where(x => x.ApplicationUserId_Sender == userId);
+            
+            var data = requests.Select(x => new ApplicationUserDto { 
+                Id = x.ApplicationUser_Reciver.Id,
+                Username = x.ApplicationUser_Reciver.UserName
+            }).ToList();
+
+            return data;
         }
 
         public bool SendRequest(string sendingUserId, string recivingUserId)
