@@ -67,15 +67,42 @@ namespace TimeOrganizer.Controllers
             var user = await userManager.FindByNameAsync(User.Identity.Name);
 
             if (user != null) {
-                IEnumerable<ApplicationUserDto> userList = userRelationshipRepository.ReadSentRequests(user.Id);
-                return new JsonResult(new { userList = userList });
+                try
+                {
+                    IEnumerable<ApplicationUserDto> userList = userRelationshipRepository.ReadSentRequests(user.Id);
+                    return new JsonResult(new { userList = userList });
+                }
+                catch (Exception e) {
+                    ModelState.AddModelError(string.Empty, e.Message);
+                }
             }
 
-            var invalidModelStateErrror = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateErrror });
+            var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            return new JsonResult(new { errors = invalidModelStateError });
         }
 
-        //TOOD get list of recived requests that are pending 
+        //Get list of recived requests that are pending 
+        [HttpGet]
+        [Route("requests/read/recived")]
+        public async Task<IActionResult> ReadRecivedFriendRequests() {
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+
+            if (user != null) {
+                try
+                {
+                    IEnumerable<ApplicationUserDto> userList = userRelationshipRepository.ReadRecivedRequests(user.Id);
+                    return new JsonResult(new { userList = userList });
+                }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError(string.Empty, e.Message);
+                }
+            }
+
+            var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            return new JsonResult(new { errors = invalidModelStateError });
+        }
+
         //TODO accept request
         //TODO reject request
 

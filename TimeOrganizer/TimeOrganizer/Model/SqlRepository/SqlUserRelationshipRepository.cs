@@ -16,6 +16,19 @@ namespace TimeOrganizer.Model.SqlRepository
             this.appDbContext = appDbContext;
         }
 
+        public IEnumerable<ApplicationUserDto> ReadRecivedRequests(string userId)
+        {
+            var requests = appDbContext.UserRelationships.Where(x => x.ApplicationUserId_Reciver == userId);
+
+            var data = requests.Select(x => new ApplicationUserDto
+            {
+                Id = x.ApplicationUser_Sender.Id,
+                Username = x.ApplicationUser_Sender.UserName
+            }).ToList();
+
+            return data;
+        }
+
         public IEnumerable<ApplicationUserDto> ReadSentRequests(string userId)
         {
             var requests = appDbContext.UserRelationships.Where(x => x.ApplicationUserId_Sender == userId);
