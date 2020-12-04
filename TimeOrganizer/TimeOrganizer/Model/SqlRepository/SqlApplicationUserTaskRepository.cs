@@ -17,10 +17,13 @@ namespace TimeOrganizer.Model.SqlRepository
 
         public ApplicationUserTask Create(string userId, int taskId)
         {
+            int acceptedStatusId = appDbContext.RelationshipStatuses.Where(x => x.Name == "Accepted").FirstOrDefault().Id;
+
             ApplicationUserTask aut = new ApplicationUserTask
             {
                 TaskId = taskId,
-                ApplicationUserId = userId
+                ApplicationUserId = userId,
+                RelationshipStatusId = acceptedStatusId
             };
 
             appDbContext.ApplicationUserTask.Add(aut);

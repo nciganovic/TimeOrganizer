@@ -12,11 +12,14 @@ namespace TimeOrganizer.Model.SqlRepository
 {
     public class SqlTaskRepository : ITaskRepository
     {
+        //TODO Renaming methods Reading and GroupBy
         private AppDbContext appDbContext;
+        private int acceptedStatusId;
 
         public SqlTaskRepository(AppDbContext appDbContext)
         {
             this.appDbContext = appDbContext;
+            acceptedStatusId = appDbContext.RelationshipStatuses.Where(x => x.Name == "Accepted").FirstOrDefault().Id;
         }
 
         public Task Create(CreateTaskViewModel createTaskViewModel)
@@ -69,9 +72,10 @@ namespace TimeOrganizer.Model.SqlRepository
                     Title = x.Title,
                     ApplicationUserId = y.ApplicationUserId,
                     TaskCreatorUsername = x.ApplicationUser.UserName,
-                    TotalUsersCount = x.ApplicationUserTasks.Count()
+                    TotalUsersCount = x.ApplicationUserTasks.Count(),
+                    RelationshipStatusId = y.RelationshipStatusId
                 })
-                .Where(x => x.ApplicationUserId == applicationUserId && startTime <= x.StartTime && endTime >= x.EndTime && x.Id != excludeTaskId)
+                .Where(x => x.ApplicationUserId == applicationUserId && startTime <= x.StartTime && endTime >= x.EndTime && x.Id != excludeTaskId && x.RelationshipStatusId == acceptedStatusId )
                 .OrderBy(x => x.StartTime)
                 .ToList();
 
@@ -152,9 +156,10 @@ namespace TimeOrganizer.Model.SqlRepository
                     TaskTypeName = x.TaskType.Name,
                     Title = x.Title,
                     ApplicationUserId = y.ApplicationUserId,
-                    TaskCreatorUsername = x.ApplicationUser.UserName
+                    TaskCreatorUsername = x.ApplicationUser.UserName,
+                    RelationshipStatusId = y.RelationshipStatusId
                 })
-                .Where(x => x.ApplicationUserId == applicationUserId && startTime <= x.StartTime && endTime >= x.EndTime)
+                .Where(x => x.ApplicationUserId == applicationUserId && startTime <= x.StartTime && endTime >= x.EndTime && x.RelationshipStatusId == acceptedStatusId)
                 .OrderBy(x => x.StartTime)
                 .ToList();
 
@@ -210,9 +215,10 @@ namespace TimeOrganizer.Model.SqlRepository
                     TaskTypeName = x.TaskType.Name,
                     Title = x.Title,
                     ApplicationUserId = y.ApplicationUserId,
-                    TaskCreatorUsername = x.ApplicationUser.UserName
+                    TaskCreatorUsername = x.ApplicationUser.UserName,
+                    RelationshipStatusId = y.RelationshipStatusId
                 })
-                .Where(x => x.ApplicationUserId == applicationUserId && startTime <= x.StartTime && endTime >= x.EndTime)
+                .Where(x => x.ApplicationUserId == applicationUserId && startTime <= x.StartTime && endTime >= x.EndTime && x.RelationshipStatusId == acceptedStatusId)
                 .OrderBy(x => x.StartTime)
                 .ToList();
 

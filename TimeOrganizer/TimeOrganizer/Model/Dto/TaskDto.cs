@@ -18,5 +18,6 @@ namespace TimeOrganizer.Model.Dto
         public string ApplicationUserId { get; set; }
         public string TaskCreatorUsername { get; set; }
         public int TotalUsersCount { get; set; }
+        public int RelationshipStatusId { get; set; }
     }
 }
