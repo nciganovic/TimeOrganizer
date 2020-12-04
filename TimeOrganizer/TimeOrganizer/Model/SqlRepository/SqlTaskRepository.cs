@@ -15,11 +15,13 @@ namespace TimeOrganizer.Model.SqlRepository
         //TODO Renaming methods Reading and GroupBy
         private AppDbContext appDbContext;
         private int acceptedStatusId;
+        private int pendingStatusId;
 
         public SqlTaskRepository(AppDbContext appDbContext)
         {
             this.appDbContext = appDbContext;
             acceptedStatusId = appDbContext.RelationshipStatuses.Where(x => x.Name == "Accepted").FirstOrDefault().Id;
+            pendingStatusId = appDbContext.RelationshipStatuses.Where(x => x.Name == "Pending").FirstOrDefault().Id;
         }
 
         public Task Create(CreateTaskViewModel createTaskViewModel)
@@ -42,7 +44,7 @@ namespace TimeOrganizer.Model.SqlRepository
 
         public Task Read(string applicationUserId, int taskId)
         {
-            ApplicationUserTask appTask = appDbContext.ApplicationUserTask.Where(x => x.TaskId == taskId && x.ApplicationUserId == applicationUserId).FirstOrDefault();
+            ApplicationUserTask appTask = appDbContext.ApplicationUserTask.Where(x => x.TaskId == taskId && x.ApplicationUserId == applicationUserId && x.RelationshipStatusId == acceptedStatusId).FirstOrDefault();
 
             if (appTask != null)
             {
@@ -245,6 +247,40 @@ namespace TimeOrganizer.Model.SqlRepository
                 .ToList();
 
             return list;
+        }
+
+        public ApplicationUserTask InviteToTask(string sendingUserId, string recivingUserId, int taskId)
+        {
+            var relationship = appDbContext.UserRelationships
+                .Where(x => ((x.ApplicationUserId_Sender == sendingUserId
+                && x.ApplicationUserId_Reciver == recivingUserId)
+                || (x.ApplicationUserId_Sender == recivingUserId
+                && x.ApplicationUserId_Reciver == sendingUserId))
+                && x.RelationshipStatusId == acceptedStatusId);
+
+            ApplicationUserTask aut = new ApplicationUserTask
+            {
+                TaskId = taskId,
+                ApplicationUserId = recivingUserId,
+                RelationshipStatusId = pendingStatusId
+            };
+
+            Task task = Read(sendingUserId, taskId);
+            DateTime startOfADay = task.StartTime.Date;
+            DateTime endOfADay = task.StartTime.Date.AddDays(1);
+
+            IEnumerable<TaskDto> tasks = Read(recivingUserId, startOfADay, endOfADay);
+
+            if (CheckDateBounds(tasks, task.StartTime, task.EndTime))
+            {
+                appDbContext.ApplicationUserTask.Add(aut);
+                appDbContext.SaveChanges();
+
+                return aut;
+            }
+            else {
+                throw new Exception($"User with id {recivingUserId} has something already scheculed during {task.StartTime} and {task.EndTime}");
+            }
         }
     }
 }

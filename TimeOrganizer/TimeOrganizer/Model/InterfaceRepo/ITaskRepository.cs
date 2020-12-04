@@ -17,5 +17,6 @@ namespace TimeOrganizer.Model.InterfaceRepo
         public bool CheckDateBounds(IEnumerable<TaskDto> tasks, DateTime taskStartTime, DateTime taskEndTime);
         public Task Update(UpdateTaskViewModel updateTaskViewModel);
         public Task Delete(int id);
+        public ApplicationUserTask InviteToTask(string sendingUserId, string recivingUserId, int taskId);
     }
 }

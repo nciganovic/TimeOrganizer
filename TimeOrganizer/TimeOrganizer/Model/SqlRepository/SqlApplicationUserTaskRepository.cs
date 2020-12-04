@@ -10,15 +10,16 @@ namespace TimeOrganizer.Model.SqlRepository
     public class SqlApplicationUserTaskRepository : IApplicationUserTaskRepository
     {
         private AppDbContext appDbContext;
+        private int acceptedStatusId;
+
         public SqlApplicationUserTaskRepository(AppDbContext appDbContext)
         {
-            this.appDbContext = appDbContext;        
+            this.appDbContext = appDbContext;
+            acceptedStatusId = appDbContext.RelationshipStatuses.Where(x => x.Name == "Accepted").FirstOrDefault().Id;
         }
 
         public ApplicationUserTask Create(string userId, int taskId)
         {
-            int acceptedStatusId = appDbContext.RelationshipStatuses.Where(x => x.Name == "Accepted").FirstOrDefault().Id;
-
             ApplicationUserTask aut = new ApplicationUserTask
             {
                 TaskId = taskId,
@@ -31,5 +32,6 @@ namespace TimeOrganizer.Model.SqlRepository
 
             return aut;
         }
+
     }
 }

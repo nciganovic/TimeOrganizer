@@ -168,5 +168,42 @@ namespace TimeOrganizer.Controllers
             return new JsonResult(data);
         }
 
+        [HttpPost]
+        [Route("task/invite")]
+        public async Task<IActionResult> InviteToTask(string recivingUserId, int taskId) { 
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+
+            if (user != null && recivingUserId != null && taskId != 0) {
+                try
+                {
+                    var result = taskRepository.InviteToTask(user.Id, recivingUserId, taskId);
+                    if (result != null)
+                    {
+                        return new JsonResult(new { message = "successfully invited to task" });
+                    }
+                    else {
+                        ModelState.AddModelError(String.Empty, "failed to invite to task");
+                    }
+                }
+                catch(Exception e) {
+                    ModelState.AddModelError(String.Empty, e.Message);
+                }
+            }
+            else {
+                if (user == null) {
+                    ModelState.AddModelError(String.Empty, "user value is not passed"); //TODO maybe chage rest of strings like to 'passed'
+                }
+                if (recivingUserId == null) {
+                    ModelState.AddModelError(String.Empty, "userId value is not passed");
+                }
+                if (taskId == 0) {
+                    ModelState.AddModelError(String.Empty, "taskId value is not passed or it is 0");
+                }
+            }
+
+            var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            return new JsonResult(new { errors = invalidModelStateError });
+        }
+
     }
 }
