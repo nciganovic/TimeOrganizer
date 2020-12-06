@@ -23,20 +23,20 @@ namespace TimeOrganizer.Model.SqlRepository
 
         public ApplicationUserTask AcceptTaskInvite(string userId, int taskId)
         {
-            ApplicationUserTask invites = appDbContext.ApplicationUserTask
+            ApplicationUserTask invite = appDbContext.ApplicationUserTask
                 .Where(x => x.ApplicationUserId == userId
                 && x.TaskId == taskId
                 && x.RelationshipStatusId == pendingStatusId).FirstOrDefault();
 
-            if (invites != null)
+            if (invite != null)
             {
-                invites.RelationshipStatusId = acceptedStatusId;
+                invite.RelationshipStatusId = acceptedStatusId;
                 
-                var edit = appDbContext.ApplicationUserTask.Attach(invites);
+                var edit = appDbContext.ApplicationUserTask.Attach(invite);
                 edit.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                 appDbContext.SaveChanges();
 
-                return invites;
+                return invite;
             }
             else {
                 throw new Exception($"Task with Id = {taskId} , ApplicationUser Id = {userId} and pending status does not exist.");
@@ -82,6 +82,23 @@ namespace TimeOrganizer.Model.SqlRepository
             return data;
         }
 
+        public ApplicationUserTask RejectTaskInvite(string userId, int taskId)
+        {
+            ApplicationUserTask invite = appDbContext.ApplicationUserTask
+                .Where(x => x.ApplicationUserId == userId
+                && x.TaskId == taskId
+                && x.RelationshipStatusId == pendingStatusId).FirstOrDefault();
 
+            if (invite != null)
+            {
+                appDbContext.ApplicationUserTask.Remove(invite);
+                appDbContext.SaveChanges();
+                return invite;
+            }
+            else
+            {
+                throw new Exception($"Task with Id = {taskId} , ApplicationUser Id = {userId} and pending status does not exist.");
+            }
+        }
     }
 }

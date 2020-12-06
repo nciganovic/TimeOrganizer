@@ -12,5 +12,6 @@ namespace TimeOrganizer.Model.InterfaceRepo
         public ApplicationUserTask Create(string userId, int taskId);
         public IEnumerable<TaskDto> ReadInvites(string userId);
         public ApplicationUserTask AcceptTaskInvite(string userId, int taskId);
+        public ApplicationUserTask RejectTaskInvite(string userId, int taskId);
     }
 }

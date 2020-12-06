@@ -269,5 +269,47 @@ namespace TimeOrganizer.Controllers
             return new JsonResult(new { errors = invalidModelStateError });
         }
 
+        [HttpPost]
+        [Route("task/reject")]
+        public async Task<IActionResult> RejectTask(int taskId)
+        {
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+
+            if (user != null && taskId != 0)
+            {
+                try
+                {
+                    var result = applicationUserTaskRepository.RejectTaskInvite(user.Id, taskId);
+
+                    if (result != null)
+                    {
+                        return new JsonResult(new { message = "Task rejected successfully" });
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Failed to reject task");
+                    }
+                }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError(string.Empty, e.Message);
+                }
+            }
+            else
+            {
+                if (taskId == 0)
+                {
+                    ModelState.AddModelError(string.Empty, "taskId value is not passed or it is 0");
+                }
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "user value is null");
+                }
+            }
+
+            var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            return new JsonResult(new { errors = invalidModelStateError });
+        }
+
     }
 }
