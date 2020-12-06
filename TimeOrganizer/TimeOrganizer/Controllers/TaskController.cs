@@ -37,6 +37,7 @@ namespace TimeOrganizer.Controllers
             this.applicationUserTaskRepository = applicationUserTaskRepository;
         }
 
+        [HttpGet]
         [Route("task/read")]
         public async Task<IActionResult> ReadTask(DateTime startTime, DateTime endTime) {
             var user = await userManager.FindByNameAsync(User.Identity.Name);
@@ -220,6 +221,47 @@ namespace TimeOrganizer.Controllers
                 catch (Exception e)
                 {
                     ModelState.AddModelError(string.Empty, e.Message);
+                }
+            }
+
+            var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            return new JsonResult(new { errors = invalidModelStateError });
+        }
+
+        [HttpPost]
+        [Route("task/accept")]
+        public async Task<IActionResult> AcceptTask(int taskId) {
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+
+            if (user != null && taskId != 0)
+            {
+                try
+                {
+                    var result = applicationUserTaskRepository.AcceptTaskInvite(user.Id, taskId);
+
+                    if (result != null)
+                    {
+                        return new JsonResult(new { message = "Task accepted successfully" });
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Failed to accept task");
+                    }
+                }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError(string.Empty, e.Message);
+                }
+            }
+            else
+            {
+                if (taskId == 0)
+                {
+                    ModelState.AddModelError(string.Empty, "taskId value is not passed or it is 0");
+                }
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "user value is null");
                 }
             }
 

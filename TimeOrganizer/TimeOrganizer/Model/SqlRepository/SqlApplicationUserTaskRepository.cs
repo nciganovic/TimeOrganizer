@@ -21,6 +21,29 @@ namespace TimeOrganizer.Model.SqlRepository
             pendingStatusId = appDbContext.RelationshipStatuses.Where(x => x.Name == "Pending").FirstOrDefault().Id;
         }
 
+        public ApplicationUserTask AcceptTaskInvite(string userId, int taskId)
+        {
+            ApplicationUserTask invites = appDbContext.ApplicationUserTask
+                .Where(x => x.ApplicationUserId == userId
+                && x.TaskId == taskId
+                && x.RelationshipStatusId == pendingStatusId).FirstOrDefault();
+
+            if (invites != null)
+            {
+                invites.RelationshipStatusId = acceptedStatusId;
+                
+                var edit = appDbContext.ApplicationUserTask.Attach(invites);
+                edit.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                appDbContext.SaveChanges();
+
+                return invites;
+            }
+            else {
+                throw new Exception($"Task with Id = {taskId} , ApplicationUser Id = {userId} and pending status does not exist.");
+            }
+
+        }
+
         public ApplicationUserTask Create(string userId, int taskId)
         {
             ApplicationUserTask aut = new ApplicationUserTask
@@ -58,5 +81,7 @@ namespace TimeOrganizer.Model.SqlRepository
 
             return data;
         }
+
+
     }
 }
