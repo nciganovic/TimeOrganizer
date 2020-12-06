@@ -139,7 +139,7 @@ namespace TimeOrganizer.Controllers
         public async Task<IActionResult> DeleteTask(int id) 
         {
             var user = await userManager.FindByNameAsync(User.Identity.Name);
-            var task = taskRepository.Read(user.Id, id);
+            var task = taskRepository.Read(user.Id, id); //maybe put this into SqlTaskRepository.cs
 
             if (task != null)
             {
