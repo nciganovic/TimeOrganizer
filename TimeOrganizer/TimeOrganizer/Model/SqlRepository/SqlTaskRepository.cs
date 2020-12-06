@@ -44,7 +44,11 @@ namespace TimeOrganizer.Model.SqlRepository
 
         public Task Read(string applicationUserId, int taskId)
         {
-            ApplicationUserTask appTask = appDbContext.ApplicationUserTask.Where(x => x.TaskId == taskId && x.ApplicationUserId == applicationUserId && x.RelationshipStatusId == acceptedStatusId).FirstOrDefault();
+            ApplicationUserTask appTask = appDbContext.ApplicationUserTask
+                .Where(x => x.TaskId == taskId 
+                && x.ApplicationUserId == applicationUserId 
+                && x.RelationshipStatusId == acceptedStatusId)
+                .FirstOrDefault();
 
             if (appTask != null)
             {
