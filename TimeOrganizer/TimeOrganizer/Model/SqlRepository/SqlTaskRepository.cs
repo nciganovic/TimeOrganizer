@@ -251,6 +251,8 @@ namespace TimeOrganizer.Model.SqlRepository
 
         public ApplicationUserTask InviteToTask(string sendingUserId, string recivingUserId, int taskId)
         {
+            //check if sending user owns this task
+
             var relationship = appDbContext.UserRelationships
                 .Where(x => ((x.ApplicationUserId_Sender == sendingUserId
                 && x.ApplicationUserId_Reciver == recivingUserId)

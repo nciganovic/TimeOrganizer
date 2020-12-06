@@ -205,5 +205,27 @@ namespace TimeOrganizer.Controllers
             return new JsonResult(new { errors = invalidModelStateError });
         }
 
+        [HttpGet]
+        [Route("task/read/invites")]
+        public async Task<IActionResult> ReadInvites() { 
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            
+            if (user != null)
+            {
+                try
+                {
+                    IEnumerable<TaskDto> invites = applicationUserTaskRepository.ReadInvites(user.Id);
+                    return new JsonResult(new { invites = invites });
+                }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError(string.Empty, e.Message);
+                }
+            }
+
+            var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
+            return new JsonResult(new { errors = invalidModelStateError });
+        }
+
     }
 }
