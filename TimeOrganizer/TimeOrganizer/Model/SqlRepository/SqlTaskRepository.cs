@@ -12,7 +12,6 @@ namespace TimeOrganizer.Model.SqlRepository
 {
     public class SqlTaskRepository : ITaskRepository
     {
-        //TODO Renaming methods Reading and GroupBy
         private AppDbContext appDbContext;
         private int acceptedStatusId;
         private int pendingStatusId;
@@ -42,7 +41,7 @@ namespace TimeOrganizer.Model.SqlRepository
             return task;
         }
 
-        public Task Read(string applicationUserId, int taskId)
+        public Task ReadSingle(string applicationUserId, int taskId)
         {
             ApplicationUserTask appTask = appDbContext.ApplicationUserTask
                 .Where(x => x.TaskId == taskId 
@@ -62,7 +61,7 @@ namespace TimeOrganizer.Model.SqlRepository
             
         }
 
-        public IEnumerable<TaskDto> Read(string applicationUserId, DateTime startTime, DateTime endTime, int excludeTaskId = -1)
+        public IEnumerable<TaskDto> ReadList(string applicationUserId, DateTime startTime, DateTime endTime, int excludeTaskId = -1)
         {
             var data = appDbContext.Tasks.Join(appDbContext.ApplicationUserTask, 
                 x => x.Id, 
@@ -132,7 +131,7 @@ namespace TimeOrganizer.Model.SqlRepository
 
         public Task Delete(string userId, int taskId)
         {
-            Task task = Read(userId, taskId);
+            Task task = ReadSingle(userId, taskId);
 
             if (task != null)
             {
@@ -162,7 +161,7 @@ namespace TimeOrganizer.Model.SqlRepository
             return task;
         }
 
-        public IList<DateGroupByDto> ReadGroupByDateExtended(string applicationUserId, DateTime startTime, DateTime endTime)
+        public IList<DateGroupByDto> ReadByDate(string applicationUserId, DateTime startTime, DateTime endTime)
         {
             var data = appDbContext.Tasks.Join(appDbContext.ApplicationUserTask,
                 x => x.Id,
@@ -221,54 +220,6 @@ namespace TimeOrganizer.Model.SqlRepository
             return list;
         }
 
-        public IList<DateGroupByDto> ReadGroupByDate(string applicationUserId, DateTime startTime, DateTime endTime)
-        {
-            var data = appDbContext.Tasks.Join(appDbContext.ApplicationUserTask,
-                x => x.Id,
-                y => y.TaskId,
-                (x, y) => new TaskDto
-                {
-                    Id = x.Id,
-                    ColorName = x.Color.Name,
-                    StartTime = x.StartTime,
-                    EndTime = x.EndTime,
-                    Description = x.Description,
-                    Priority = x.Priority,
-                    TaskTypeName = x.TaskType.Name,
-                    Title = x.Title,
-                    ApplicationUserId = y.ApplicationUserId,
-                    TaskCreatorUsername = x.ApplicationUser.UserName,
-                    RelationshipStatusId = y.RelationshipStatusId
-                })
-                .Where(x => x.ApplicationUserId == applicationUserId && startTime <= x.StartTime && endTime >= x.EndTime && x.RelationshipStatusId == acceptedStatusId)
-                .OrderBy(x => x.StartTime)
-                .ToList();
-
-            IList<DateGroupByDto> list = data
-                .Select(x => new TaskDto
-                {
-                    Id = x.Id,
-                    ColorName = x.ColorName,
-                    ApplicationUserId = x.ApplicationUserId,
-                    StartTime = x.StartTime,
-                    EndTime = x.EndTime,
-                    Description = x.Description,
-                    Priority = x.Priority,
-                    TaskCreatorUsername = x.TaskCreatorUsername,
-                    TaskTypeName = x.TaskTypeName,
-                    Title = x.Title
-                })
-                .GroupBy(x => x.StartTime.Date)
-                .Select(x => new DateGroupByDto
-                {
-                    Count = x.Count(),
-                    Date = x.Key,
-                })
-                .ToList();
-
-            return list;
-        }
-
         public ApplicationUserTask InviteToTask(string sendingUserId, string recivingUserId, int taskId)
         {
             var relationship = appDbContext.UserRelationships
@@ -287,13 +238,13 @@ namespace TimeOrganizer.Model.SqlRepository
                     RelationshipStatusId = pendingStatusId
                 };
 
-                Task task = Read(sendingUserId, taskId);
+                Task task = ReadSingle(sendingUserId, taskId);
 
                 if (task != null) {
                     DateTime startOfADay = task.StartTime.Date;
                     DateTime endOfADay = task.StartTime.Date.AddDays(1);
 
-                    IEnumerable<TaskDto> tasks = Read(recivingUserId, startOfADay, endOfADay);
+                    IEnumerable<TaskDto> tasks = ReadList(recivingUserId, startOfADay, endOfADay);
 
                     if (CheckDateBounds(tasks, task.StartTime, task.EndTime))
                     {

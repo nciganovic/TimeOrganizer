@@ -41,7 +41,7 @@ namespace TimeOrganizer.Controllers
         [Route("task/read")]
         public async Task<IActionResult> ReadTask(DateTime startTime, DateTime endTime) {
             var user = await userManager.FindByNameAsync(User.Identity.Name);
-            var data = taskRepository.Read(user.Id, startTime, endTime);
+            var data = taskRepository.ReadList(user.Id, startTime, endTime);
             return new JsonResult(data);
         }
 
@@ -89,7 +89,7 @@ namespace TimeOrganizer.Controllers
             DateTime currentDayStart = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0);
             DateTime currentDayEnd = new DateTime(date.Year, date.Month, date.Day, 23, 59, 59);
 
-            IEnumerable<TaskDto> tasksForCurrentDay = taskRepository.Read(userId, currentDayStart, currentDayEnd, skipTaskId);
+            IEnumerable<TaskDto> tasksForCurrentDay = taskRepository.ReadList(userId, currentDayStart, currentDayEnd, skipTaskId);
             
             return tasksForCurrentDay;
         }
@@ -161,10 +161,10 @@ namespace TimeOrganizer.Controllers
 
         [HttpGet]
         [Route("task/group")]
-        public async Task<IActionResult> ReadGroupBy(DateTime startTime, DateTime endTime)
+        public async Task<IActionResult> GroupByTask(DateTime startTime, DateTime endTime)
         {
             var user = await userManager.FindByNameAsync(User.Identity.Name);
-            var data = taskRepository.ReadGroupByDate(user.Id, startTime, endTime);
+            var data = taskRepository.ReadByDate(user.Id, startTime, endTime);
             return new JsonResult(data);
         }
 
