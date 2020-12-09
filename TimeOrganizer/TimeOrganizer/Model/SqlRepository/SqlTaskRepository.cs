@@ -56,7 +56,7 @@ namespace TimeOrganizer.Model.SqlRepository
                 return task;
             }
             else {
-                return null;
+                return null; //TODO try to throw new exception and remove on others like Delete()
             }
 
             
@@ -130,17 +130,33 @@ namespace TimeOrganizer.Model.SqlRepository
             return task;
         }
 
-        public Task Delete(int id)
+        public Task Delete(string userId, int taskId)
         {
-            Task task = appDbContext.Tasks.Find(id);
+            Task task = Read(userId, taskId);
 
             if (task != null)
             {
-                appDbContext.Remove(task);
+                //check if author or other user is deleting task
+
+                ApplicationUserTask applicationUserTask = appDbContext.ApplicationUserTask
+                    .Where(x => x.ApplicationUserId == userId 
+                    && x.TaskId == taskId)
+                    .FirstOrDefault();
+                appDbContext.ApplicationUserTask.Remove(applicationUserTask);
                 appDbContext.SaveChanges();
+
+                ApplicationUserTask checkIfAnyoneHasTask = appDbContext.ApplicationUserTask
+                    .Where(x => x.TaskId == taskId)
+                    .FirstOrDefault();
+
+                if (checkIfAnyoneHasTask == null) {
+                    appDbContext.Tasks.Remove(task);
+                    appDbContext.SaveChanges();
+                }
+
             }
             else {
-                throw new Exception($"Task with id = {id} does not exist");
+                throw new Exception($"Task with id = {taskId} does not exist");
             }
 
             return task;
@@ -255,8 +271,6 @@ namespace TimeOrganizer.Model.SqlRepository
 
         public ApplicationUserTask InviteToTask(string sendingUserId, string recivingUserId, int taskId)
         {
-            //check if sending user owns this task
-
             var relationship = appDbContext.UserRelationships
                 .Where(x => ((x.ApplicationUserId_Sender == sendingUserId
                 && x.ApplicationUserId_Reciver == recivingUserId)
@@ -264,28 +278,42 @@ namespace TimeOrganizer.Model.SqlRepository
                 && x.ApplicationUserId_Reciver == sendingUserId))
                 && x.RelationshipStatusId == acceptedStatusId);
 
-            ApplicationUserTask aut = new ApplicationUserTask
+            if (relationship != null)
             {
-                TaskId = taskId,
-                ApplicationUserId = recivingUserId,
-                RelationshipStatusId = pendingStatusId
-            };
+                ApplicationUserTask aut = new ApplicationUserTask
+                {
+                    TaskId = taskId,
+                    ApplicationUserId = recivingUserId,
+                    RelationshipStatusId = pendingStatusId
+                };
 
-            Task task = Read(sendingUserId, taskId);
-            DateTime startOfADay = task.StartTime.Date;
-            DateTime endOfADay = task.StartTime.Date.AddDays(1);
+                Task task = Read(sendingUserId, taskId);
 
-            IEnumerable<TaskDto> tasks = Read(recivingUserId, startOfADay, endOfADay);
+                if (task != null) {
+                    DateTime startOfADay = task.StartTime.Date;
+                    DateTime endOfADay = task.StartTime.Date.AddDays(1);
 
-            if (CheckDateBounds(tasks, task.StartTime, task.EndTime))
-            {
-                appDbContext.ApplicationUserTask.Add(aut);
-                appDbContext.SaveChanges();
+                    IEnumerable<TaskDto> tasks = Read(recivingUserId, startOfADay, endOfADay);
 
-                return aut;
+                    if (CheckDateBounds(tasks, task.StartTime, task.EndTime))
+                    {
+                        appDbContext.ApplicationUserTask.Add(aut);
+                        appDbContext.SaveChanges();
+
+                        return aut;
+                    }
+                    else
+                    {
+                        throw new Exception($"User with id {recivingUserId} has something already scheculed during {task.StartTime} and {task.EndTime}");
+                    }
+                }
+                else{
+                    throw new Exception($"Task with {taskId} does not exist.");
+                }
+                
             }
             else {
-                throw new Exception($"User with id {recivingUserId} has something already scheculed during {task.StartTime} and {task.EndTime}");
+                throw new Exception($"No relationship between {sendingUserId} and {recivingUserId}");
             }
         }
     }

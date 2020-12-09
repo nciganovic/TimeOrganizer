@@ -136,16 +136,15 @@ namespace TimeOrganizer.Controllers
 
         [HttpPost]
         [Route("task/delete")]
-        public async Task<IActionResult> DeleteTask(int id) 
+        public async Task<IActionResult> DeleteTask(int taskId) 
         {
             var user = await userManager.FindByNameAsync(User.Identity.Name);
-            var task = taskRepository.Read(user.Id, id); //maybe put this into SqlTaskRepository.cs
 
-            if (task != null)
+            if (user != null)
             {
                 try
                 {
-                    taskRepository.Delete(id);
+                    taskRepository.Delete(user.Id, taskId);
                 }
                 catch (Exception exp)
                 {
@@ -153,7 +152,7 @@ namespace TimeOrganizer.Controllers
                 }
             }
             else {
-                ModelState.AddModelError(string.Empty, $"Task with id = {id} and userId = {user.Id} does not exist");
+                ModelState.AddModelError(string.Empty, $"Task with id = {taskId} and userId = {user.Id} does not exist");
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
