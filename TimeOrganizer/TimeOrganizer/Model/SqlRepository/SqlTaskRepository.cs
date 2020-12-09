@@ -80,7 +80,11 @@ namespace TimeOrganizer.Model.SqlRepository
                     TotalUsersCount = x.ApplicationUserTasks.Count(),
                     RelationshipStatusId = y.RelationshipStatusId
                 })
-                .Where(x => x.ApplicationUserId == applicationUserId && startTime <= x.StartTime && endTime >= x.EndTime && x.Id != excludeTaskId && x.RelationshipStatusId == acceptedStatusId )
+                .Where(x => x.ApplicationUserId == applicationUserId 
+                && startTime <= x.StartTime 
+                && endTime >= x.EndTime 
+                && x.Id != excludeTaskId 
+                && x.RelationshipStatusId == acceptedStatusId )
                 .OrderBy(x => x.StartTime)
                 .ToList();
 
@@ -180,7 +184,10 @@ namespace TimeOrganizer.Model.SqlRepository
                     TaskCreatorUsername = x.ApplicationUser.UserName,
                     RelationshipStatusId = y.RelationshipStatusId
                 })
-                .Where(x => x.ApplicationUserId == applicationUserId && startTime <= x.StartTime && endTime >= x.EndTime && x.RelationshipStatusId == acceptedStatusId)
+                .Where(x => x.ApplicationUserId == applicationUserId 
+                && startTime <= x.StartTime 
+                && endTime >= x.EndTime 
+                && x.RelationshipStatusId == acceptedStatusId)
                 .OrderBy(x => x.StartTime)
                 .ToList();
 
@@ -202,7 +209,7 @@ namespace TimeOrganizer.Model.SqlRepository
                 .Select(x => new DateGroupByDto{ 
                     Count = x.Count(),
                     Date = x.Key,
-                    Tasks = x.Select(y => new TaskDto {
+                    Tasks = x.Select(y => new TaskDto { //TODO TaskDto(param1, param2) to make mandatory parameters
                         Id = y.Id,
                         ColorName = y.ColorName,
                         ApplicationUserId = y.ApplicationUserId,
