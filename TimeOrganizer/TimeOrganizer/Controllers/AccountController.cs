@@ -15,15 +15,12 @@ namespace TimeOrganizer.Controllers
     public class AccountController : Controller
     {
         private UserManager<ApplicationUser> userManager;
-        private ISchoolRepository schoolRepository;
         private SignInManager<ApplicationUser> signInManager;
 
         public AccountController(UserManager<ApplicationUser> userManager, 
-            ISchoolRepository schoolRepository, 
             SignInManager<ApplicationUser> signInManager)
         {
             this.userManager = userManager;
-            this.schoolRepository = schoolRepository;
             this.signInManager = signInManager;
         }
 
@@ -69,52 +66,40 @@ namespace TimeOrganizer.Controllers
         {
             if (ModelState.IsValid)
             {
-                //Check if school id exists
-                var school = schoolRepository.GetSchoolById(registerViewModel.SchoolId);
-
-
-                if (school == null)
+                var user = new ApplicationUser
                 {
-                    ModelState.AddModelError(string.Empty, "This school does not exist.");
+                    UserName = registerViewModel.Email,
+                    FirstName = registerViewModel.FirstName,
+                    LastName = registerViewModel.LastName,
+                    Email = registerViewModel.Email,
+                    EmailConfirmed = true //auto confirm email for now 
+                };
 
-                }
-                else{
-                    var user = new ApplicationUser
+                //Trows error if only school id is bad
+                var result = await userManager.CreateAsync(user, registerViewModel.Password);
+
+                if (result.Succeeded)
+                {
+                    var createRoleResult = await userManager.AddToRoleAsync(user, "User");
+
+                    if (createRoleResult.Succeeded)
                     {
-                        UserName = registerViewModel.Email,
-                        FirstName = registerViewModel.FirstName,
-                        LastName = registerViewModel.LastName,
-                        Email = registerViewModel.Email,
-                        SchoolId = registerViewModel.SchoolId, //check if school id exists
-                        EmailConfirmed = true //auto confirm email for now 
-                    };
-
-                    //Trows error if only school id is bad
-                    var result = await userManager.CreateAsync(user, registerViewModel.Password);
-
-                    if (result.Succeeded)
-                    {
-                        var createRoleResult = await userManager.AddToRoleAsync(user, "User");
-
-                        if (createRoleResult.Succeeded)
-                        {
-                            return new JsonResult(new { Message = "success" });
-                        }
-                        else {
-                            foreach (var error in createRoleResult.Errors)
-                            {
-                                ModelState.AddModelError(string.Empty, error.Description);
-                            }
-
-                        }
+                        return new JsonResult(new { Message = "success" });
                     }
-                    else
-                    {
-                        foreach (var error in result.Errors)
+                    else {
+                        foreach (var error in createRoleResult.Errors)
                         {
                             ModelState.AddModelError(string.Empty, error.Description);
-                            //User name 'nciganovic@gmail.com' is already taken is possible answer 
                         }
+
+                    }
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                        //User name 'nciganovic@gmail.com' is already taken is possible answer 
                     }
                 }
 

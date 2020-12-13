@@ -13,10 +13,6 @@ namespace TimeOrganizer.Model.Tables
 
         public string LastName { get; set; }
 
-        public int SchoolId { get; set; }
-
-        public School School { get; set; }
-
         public List<ApplicationUserTask> ApplicationUserTasks { get; set; }
     
         public List<Task> Tasks { get; set; }

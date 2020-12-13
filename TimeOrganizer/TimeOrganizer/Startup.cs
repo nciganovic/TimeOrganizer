@@ -38,8 +38,6 @@ namespace TimeOrganizer
                 .AddEntityFrameworkStores<AppDbContext>();
 
             services.AddMvc(options => options.EnableEndpointRouting = false);
-            services.AddScoped<ISchoolTypeRepository, SqlSchoolTypeRepository>();
-            services.AddScoped<ISchoolRepository, SqlSchoolRepository>();
             services.AddScoped<ITaskRepository, SqlTaskRepository>();
             services.AddScoped<ITaskTypeRepository, SqlTaskTypeRepository>();
             services.AddScoped<IColorRepository, SqlColorRepository>();
