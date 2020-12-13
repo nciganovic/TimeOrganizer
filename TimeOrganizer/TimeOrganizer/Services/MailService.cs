@@ -17,7 +17,7 @@ namespace TimeOrganizer.Services
 
         public MailService(IOptions<MailSettings> mailSettings)
         {
-            mailSettings = (IOptions<MailSettings>)mailSettings.Value;
+            this.mailSettings = mailSettings.Value;
         }
 
         public async System.Threading.Tasks.Task SendEmailAsync(MailRequest mailRequest)
