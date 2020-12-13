@@ -15,6 +15,8 @@ using TimeOrganizer.Model.SqlRepository;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using TimeOrganizer.Model.Tables;
+using TimeOrganizer.Settings;
+using System.Configuration;
 
 namespace TimeOrganizer
 {
@@ -43,6 +45,7 @@ namespace TimeOrganizer
             services.AddScoped<IColorRepository, SqlColorRepository>();
             services.AddScoped<IApplicationUserTaskRepository, SqlApplicationUserTaskRepository>();
             services.AddScoped<IUserRelationshipRepository, SqlUserRelationshipRepository>();
+            services.Configure<MailSettings>(conf.GetSection("MailSettings"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
