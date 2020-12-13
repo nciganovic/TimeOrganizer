@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using TimeOrganizer.Model.Tables;
 using TimeOrganizer.ViewModel;
 using TimeOrganizer.Model.InterfaceRepo;
+using TimeOrganizer.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TimeOrganizer.Controllers
 {
@@ -16,12 +18,15 @@ namespace TimeOrganizer.Controllers
     {
         private UserManager<ApplicationUser> userManager;
         private SignInManager<ApplicationUser> signInManager;
+        private IMailService mailService;
 
         public AccountController(UserManager<ApplicationUser> userManager, 
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            IMailService mailService)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.mailService = mailService;
         }
 
         [HttpPost]
@@ -72,19 +77,37 @@ namespace TimeOrganizer.Controllers
                     FirstName = registerViewModel.FirstName,
                     LastName = registerViewModel.LastName,
                     Email = registerViewModel.Email,
-                    EmailConfirmed = true //auto confirm email for now 
+                    EmailConfirmed = false
                 };
 
-                //Trows error if only school id is bad
                 var result = await userManager.CreateAsync(user, registerViewModel.Password);
-
+                
                 if (result.Succeeded)
                 {
                     var createRoleResult = await userManager.AddToRoleAsync(user, "User");
 
                     if (createRoleResult.Succeeded)
                     {
-                        return new JsonResult(new { Message = "success" });
+                        var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, token = token }, Request.Scheme);
+
+                        MailRequest mailRequest = new MailRequest
+                        {
+                            Subject = "Confirm your email",
+                            Body = $"Click here to confirm your email address: {confirmationLink}",
+                            ToEmail = user.Email
+                        };
+
+                        try
+                        {
+                            await mailService.SendEmailAsync(mailRequest);
+                            return Ok();
+                        }
+                        catch (Exception ex)
+                        {
+                            ModelState.AddModelError(String.Empty, ex.Message);
+                        }
+
                     }
                     else {
                         foreach (var error in createRoleResult.Errors)
@@ -110,5 +133,34 @@ namespace TimeOrganizer.Controllers
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
             return new JsonResult(new { Errors = invalidModelStateError });
         }
+
+        [HttpGet]
+        [AllowAnonymous] //TODO mayber unnecessery
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (userId == null || token == null)
+            {
+                return RedirectToAction("index", "home");
+            }
+
+            var user = await userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return new JsonResult(new { Errors = $"User with Id = {userId} is not found." });
+            }
+
+            var result = await userManager.ConfirmEmailAsync(user, token);
+
+            if (result.Succeeded)
+            {
+                return new JsonResult(new { message = $"{user.Email} is successfully confirmed." });
+            }
+            else
+            {
+                return new JsonResult(new { Errors = $"failed to confirm {user.Email}" });
+            }
+        }
+
     }
 }

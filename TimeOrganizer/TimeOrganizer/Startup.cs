@@ -38,7 +38,7 @@ namespace TimeOrganizer
                 options => options.UseSqlServer(conf.GetConnectionString("TimeOrganizerDatabase")));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<AppDbContext>();
+                .AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
             services.AddMvc(options => options.EnableEndpointRouting = false);
             services.AddScoped<ITaskRepository, SqlTaskRepository>();
