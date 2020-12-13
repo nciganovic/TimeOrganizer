@@ -25,11 +25,6 @@ namespace TimeOrganizer.ViewModel
         public string Email { get; set; }
 
         [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Please select your school")]
-        public int SchoolId { get; set; }
-
-
-        [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
