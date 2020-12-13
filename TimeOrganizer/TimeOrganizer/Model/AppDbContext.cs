@@ -18,6 +18,7 @@ namespace TimeOrganizer.Model
         public DbSet<ApplicationUserTask> ApplicationUserTask { get; set; }
         public DbSet<RelationshipStatus> RelationshipStatuses { get; set; }
         public DbSet<UserRelationship> UserRelationships { get; set; }
+        public DbSet<MailRequest> MailRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
