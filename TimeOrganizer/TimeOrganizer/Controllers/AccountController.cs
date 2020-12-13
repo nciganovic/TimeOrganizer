@@ -36,25 +36,36 @@ namespace TimeOrganizer.Controllers
             if (ModelState.IsValid) {
                 var user = await userManager.FindByEmailAsync(loginViewModel.Email);
 
-                bool isEmailConfirmed = true;
-                if (user != null && !user.EmailConfirmed && (await userManager.CheckPasswordAsync(user, loginViewModel.Password))) {
-                    ModelState.AddModelError(string.Empty, "Email not confirmed yet.");
-                    isEmailConfirmed = false;
-                }
-
-                var result = await signInManager.PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe, false);
-
-                if (result.Succeeded && isEmailConfirmed)
+                if (user == null)
                 {
-                    if (Url.IsLocalUrl(ReturnUrl) && !String.IsNullOrEmpty(ReturnUrl)){
-                        return Redirect(ReturnUrl);
-                    }
-                    else {
-                        return RedirectToAction("index", "home");
-                    }
+                    ModelState.AddModelError(string.Empty, "This user does not exist");
+                }
+                else if (!user.EmailConfirmed)
+                {
+                    ModelState.AddModelError(string.Empty, "Email not confirmed yet.");
+                }
+                else if (!await userManager.CheckPasswordAsync(user, loginViewModel.Password))
+                {
+                    ModelState.AddModelError(string.Empty, "Wrong password");
                 }
                 else {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt");
+                    var result = await signInManager.PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe, false);
+
+                    if (result.Succeeded)
+                    {
+                        if (Url.IsLocalUrl(ReturnUrl) && !String.IsNullOrEmpty(ReturnUrl))
+                        {
+                            return Redirect(ReturnUrl);
+                        }
+                        else
+                        {
+                            return RedirectToAction("index", "home");
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Invalid login attempt");
+                    }
                 }
             }
 
