@@ -48,6 +48,7 @@ namespace TimeOrganizer
             services.AddScoped<IUserRelationshipRepository, SqlUserRelationshipRepository>();
             services.Configure<MailSettings>(conf.GetSection("MailSettings"));
             services.AddTransient<IMailService, MailService>();
+            services.AddScoped<IMailRequestRepository, SqlMailRequestRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

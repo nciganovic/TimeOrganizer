@@ -19,14 +19,17 @@ namespace TimeOrganizer.Controllers
         private UserManager<ApplicationUser> userManager;
         private SignInManager<ApplicationUser> signInManager;
         private IMailService mailService;
+        private IMailRequestRepository mailRequestRepository;
 
         public AccountController(UserManager<ApplicationUser> userManager, 
             SignInManager<ApplicationUser> signInManager,
-            IMailService mailService)
+            IMailService mailService,
+            IMailRequestRepository mailRequestRepository)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.mailService = mailService;
+            this.mailRequestRepository = mailRequestRepository;
         }
 
         [HttpPost]
@@ -112,6 +115,7 @@ namespace TimeOrganizer.Controllers
                         try
                         {
                             await mailService.SendEmailAsync(mailRequest);
+                            mailRequestRepository.Create(mailRequest);
                             return Ok();
                         }
                         catch (Exception ex)
