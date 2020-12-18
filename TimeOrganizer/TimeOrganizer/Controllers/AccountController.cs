@@ -72,10 +72,8 @@ namespace TimeOrganizer.Controllers
                 }
             }
 
-            //Return Errors as JSON 
-            //Later can be return View(model);
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
 
         
@@ -116,7 +114,7 @@ namespace TimeOrganizer.Controllers
                         {
                             await mailService.SendEmailAsync(mailRequest);
                             mailRequestRepository.Create(mailRequest);
-                            return Ok();
+                            return Ok(new { message = "User registered successfully, verify your account with email we sent you." });
                         }
                         catch (Exception ex)
                         {
@@ -136,44 +134,46 @@ namespace TimeOrganizer.Controllers
                 {
                     foreach (var error in result.Errors)
                     {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                        //User name 'nciganovic@gmail.com' is already taken is possible answer 
+                        if (error.Code == "DuplicateUserName")
+                        {
+                            ModelState.AddModelError(string.Empty, $"Email {user.Email} is already taken");
+                        }
+                        else {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
                     }
                 }
 
             }
           
-            //Return Errors as JSON 
-            //Later can be return View(model);
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { Errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
 
         [HttpGet]
-        [AllowAnonymous] //TODO mayber unnecessery
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
             if (userId == null || token == null)
             {
-                return RedirectToAction("index", "home");
+                return StatusCode(406, new { message = "User id or token id value does not exist." });
             }
 
             var user = await userManager.FindByIdAsync(userId);
 
             if (user == null)
             {
-                return new JsonResult(new { Errors = $"User with Id = {userId} is not found." });
+                return StatusCode(406, new { message = $"User with Id = {userId} is not found." });
             }
 
             var result = await userManager.ConfirmEmailAsync(user, token);
 
             if (result.Succeeded)
             {
-                return new JsonResult(new { message = $"{user.Email} is successfully confirmed." });
+                return Ok(new { message = $"{user.Email} is successfully confirmed." });
             }
             else
             {
-                return new JsonResult(new { Errors = $"failed to confirm {user.Email}" });
+                return StatusCode(400, new { message = $"failed to confirm {user.Email}" } );
             }
         }
 
