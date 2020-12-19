@@ -32,7 +32,7 @@ namespace TimeOrganizer.Controllers
                 IdentityResult identityResult = await roleManager.CreateAsync(identityRole);
 
                 if (identityResult.Succeeded) {
-                    return new JsonResult(new { message = $"Role {createRoleViewModel.Name} created successfully" });
+                    return Ok(new { message = $"Role {createRoleViewModel.Name} created successfully" });
                 }
 
                 foreach (var error in identityResult.Errors) {
@@ -41,7 +41,7 @@ namespace TimeOrganizer.Controllers
             }
 
             var invalidModelStateErrror = ModelState.Select(x => x.Value.Errors).Where(y => y.Count() > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateErrror }) ;
+            return StatusCode(406, new { message = invalidModelStateErrror });
         }
 
         [HttpPost]
@@ -62,7 +62,7 @@ namespace TimeOrganizer.Controllers
                     var result = await userManager.AddToRoleAsync(user, role);
                     
                     if (!result.Succeeded) {
-                        ModelState.AddModelError(string.Empty, $"Failed to add {role} to user");                    
+                        ModelState.AddModelError(string.Empty, $"Failed to add {role} to user");
                     }
                 }
                 
@@ -74,10 +74,10 @@ namespace TimeOrganizer.Controllers
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count() > 0).ToList();
 
             if (invalidModelStateError.Count == 0) {
-                return new JsonResult(new { message = "Roles successfully added." });
+                return Ok(new { message = "Role/s successfully added." });
             }
 
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
     }
 }
