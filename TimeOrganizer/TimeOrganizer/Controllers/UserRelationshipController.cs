@@ -37,11 +37,11 @@ namespace TimeOrganizer.Controllers
 
                     if (result)
                     {
-                        return new JsonResult(new { message = "success" });
+                        return Ok(new { message = "request sent successfully" });
                     }
                     else
                     {
-                        return new JsonResult(new { message = "failed to send friend request" });
+                        return StatusCode(400, new { message = "failed to send friend request" });
                     }
                 }
                 catch (Exception e)
@@ -62,7 +62,7 @@ namespace TimeOrganizer.Controllers
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
 
         //Get list of sent request that are pending 
@@ -77,7 +77,7 @@ namespace TimeOrganizer.Controllers
                 try
                 {
                     IEnumerable<ApplicationUserDto> userList = userRelationshipRepository.ReadSentRequests(user.Id);
-                    return new JsonResult(new { userList = userList });
+                    return Ok(new { userList = userList });
                 }
                 catch (Exception e)
                 {
@@ -86,7 +86,7 @@ namespace TimeOrganizer.Controllers
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
 
         //Get list of recived requests that are pending 
@@ -101,7 +101,7 @@ namespace TimeOrganizer.Controllers
                 try
                 {
                     IEnumerable<ApplicationUserDto> userList = userRelationshipRepository.ReadRecivedRequests(user.Id);
-                    return new JsonResult(new { userList = userList });
+                    return Ok(new { userList = userList });
                 }
                 catch (Exception e)
                 {
@@ -110,7 +110,7 @@ namespace TimeOrganizer.Controllers
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
 
         //Accept request
@@ -128,7 +128,7 @@ namespace TimeOrganizer.Controllers
 
                     if (result)
                     {
-                        return new JsonResult(new { message = "Friend request accepted successfully" });
+                        return Ok(new { message = "Friend request accepted successfully" });
                     }
                     else
                     {
@@ -154,7 +154,7 @@ namespace TimeOrganizer.Controllers
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
 
         //Reject request
@@ -171,7 +171,7 @@ namespace TimeOrganizer.Controllers
 
                     if (result)
                     {
-                        return new JsonResult(new { message = "Friend request rejected successfully" });
+                        return Ok(new { message = "Friend request rejected successfully" });
                     }
                     else
                     {
@@ -196,7 +196,7 @@ namespace TimeOrganizer.Controllers
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
 
         //Read all accepted requests aka list of friends
@@ -210,7 +210,7 @@ namespace TimeOrganizer.Controllers
                 try
                 {
                     IEnumerable<ApplicationUserDto> userList = userRelationshipRepository.ReadAcceptedRequests(user.Id);
-                    return new JsonResult(new { userList = userList });
+                    return Ok(new { userList = userList });
                 }
                 catch (Exception e)
                 {
@@ -219,7 +219,7 @@ namespace TimeOrganizer.Controllers
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
 
         [HttpPost]
@@ -236,7 +236,7 @@ namespace TimeOrganizer.Controllers
 
                     if (result)
                     {
-                        return new JsonResult(new { message = "Friend removed successfully" });
+                        return Ok(new { message = "Friend removed successfully" });
                     }
                     else
                     {
@@ -261,7 +261,7 @@ namespace TimeOrganizer.Controllers
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { errors = invalidModelStateError });
         }
     }
 }
