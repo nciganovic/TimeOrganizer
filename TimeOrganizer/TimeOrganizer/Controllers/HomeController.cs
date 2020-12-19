@@ -26,7 +26,7 @@ namespace TimeOrganizer.Controllers
         public async Task<IActionResult> Index() {
             var user = await userManager.FindByNameAsync(User.Identity.Name);
             
-            return new JsonResult(new {
+            return Ok(new {
                 Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
