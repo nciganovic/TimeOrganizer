@@ -41,8 +41,8 @@ namespace TimeOrganizer.Controllers
         [Route("task/read")]
         public async Task<IActionResult> ReadTask(DateTime startTime, DateTime endTime) {
             var user = await userManager.FindByNameAsync(User.Identity.Name);
-            var data = taskRepository.ReadList(user.Id, startTime, endTime);
-            return new JsonResult(data);
+            var data = taskRepository.ReadList(user.Id, startTime, endTime); //TODO maybe try catch
+            return Ok(new { data = data });
         }
 
         [HttpPost]
@@ -71,8 +71,7 @@ namespace TimeOrganizer.Controllers
                     {
                         var task = taskRepository.Create(createTaskViewModel);
                         applicationUserTaskRepository.Create(task.ApplicationUserId, task.Id);
-                        return new JsonResult(new { message = "task created successfully" });
-                        //return new JsonResult(new { task = task});                                                                                                            
+                        return Ok(new { message = "task created successfully" });                                                                                                           
                     }
                     catch (Exception exp) {
                         ModelState.AddModelError(string.Empty, exp.Message);
@@ -81,7 +80,7 @@ namespace TimeOrganizer.Controllers
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
 
         private IEnumerable<TaskDto> GetAllTasksForCurrentDay(DateTime date, string userId, int skipTaskId = -1) 
@@ -121,7 +120,7 @@ namespace TimeOrganizer.Controllers
                     try
                     {
                         var task = taskRepository.Update(updateTaskViewModel);
-                        return new JsonResult(new { message = "task updated successfully" });                                                                                                      
+                        return Ok(new { message = "task updated successfully" });                                                                                                      
                     }
                     catch (Exception exp)
                     {
@@ -131,7 +130,7 @@ namespace TimeOrganizer.Controllers
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
 
         [HttpPost]
@@ -145,6 +144,7 @@ namespace TimeOrganizer.Controllers
                 try
                 {
                     taskRepository.Delete(user.Id, taskId);
+                    return Ok("Task deleted successfully");
                 }
                 catch (Exception exp)
                 {
@@ -156,7 +156,7 @@ namespace TimeOrganizer.Controllers
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
 
         [HttpGet]
@@ -165,7 +165,7 @@ namespace TimeOrganizer.Controllers
         {
             var user = await userManager.FindByNameAsync(User.Identity.Name);
             var data = taskRepository.ReadByDate(user.Id, startTime, endTime);
-            return new JsonResult(data);
+            return Ok(new { data = data });
         }
 
         [HttpPost]
@@ -179,7 +179,7 @@ namespace TimeOrganizer.Controllers
                     var result = taskRepository.InviteToTask(user.Id, recivingUserId, taskId);
                     if (result != null)
                     {
-                        return new JsonResult(new { message = "successfully invited to task" });
+                        return Ok(new { message = "successfully invited to task" });
                     }
                     else {
                         ModelState.AddModelError(String.Empty, "failed to invite to task");
@@ -202,7 +202,7 @@ namespace TimeOrganizer.Controllers
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
 
         [HttpGet]
@@ -215,7 +215,7 @@ namespace TimeOrganizer.Controllers
                 try
                 {
                     IEnumerable<TaskDto> invites = applicationUserTaskRepository.ReadInvites(user.Id);
-                    return new JsonResult(new { invites = invites });
+                    return Ok(new { invites = invites });
                 }
                 catch (Exception e)
                 {
@@ -224,7 +224,7 @@ namespace TimeOrganizer.Controllers
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
 
         [HttpPost]
@@ -240,7 +240,7 @@ namespace TimeOrganizer.Controllers
 
                     if (result != null)
                     {
-                        return new JsonResult(new { message = "Task accepted successfully" });
+                        return Ok(new { message = "Task accepted successfully" });
                     }
                     else
                     {
@@ -265,7 +265,7 @@ namespace TimeOrganizer.Controllers
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
 
         [HttpPost]
@@ -282,7 +282,7 @@ namespace TimeOrganizer.Controllers
 
                     if (result != null)
                     {
-                        return new JsonResult(new { message = "Task rejected successfully" });
+                        return Ok(new { message = "Task rejected successfully" });
                     }
                     else
                     {
@@ -307,7 +307,7 @@ namespace TimeOrganizer.Controllers
             }
 
             var invalidModelStateError = ModelState.Select(x => x.Value.Errors).Where(y => y.Count > 0).ToList();
-            return new JsonResult(new { errors = invalidModelStateError });
+            return StatusCode(406, new { message = invalidModelStateError });
         }
 
     }
